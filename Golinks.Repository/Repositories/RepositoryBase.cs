@@ -12,7 +12,7 @@ public class RepositoryBase<TDocument> : IRepositoryBase<TDocument> where TDocum
     public RepositoryBase(IMongoDbSettings settings)
     {
         var database = new MongoClient(settings.ConnectionString).GetDatabase(settings.DatabaseName);
-        _collection = database.GetCollection<TDocument>(nameof(TDocument));
+        _collection = database.GetCollection<TDocument>(typeof(TDocument).Name);
     }
 
     public virtual IQueryable<TDocument> AsQueryable()
