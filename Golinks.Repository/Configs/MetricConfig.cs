@@ -7,7 +7,7 @@ public static class MetricConfig
 {
     public static void Apply()
     {
-        BsonClassMap.RegisterClassMap<Link>(cm =>
+        BsonClassMap.RegisterClassMap<Metric>(cm =>
         {
             cm.AutoMap();
         });
