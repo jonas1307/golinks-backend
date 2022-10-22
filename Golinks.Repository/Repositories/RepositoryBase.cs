@@ -1,5 +1,6 @@
 ﻿using Golinks.Repository.Contracts;
 using Golinks.Repository.Extensions.Settings;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 
@@ -34,6 +35,16 @@ public class RepositoryBase<TDocument> : IRepositoryBase<TDocument> where TDocum
     public virtual Task<TDocument> FindAsync(Expression<Func<TDocument, bool>> filterExpression)
     {
         return Task.Run(() => _collection.Find(filterExpression).FirstOrDefaultAsync());
+    }
+
+    public Task<TDocument> FindByIdAsync(string id)
+    {
+        return Task.Run(() =>
+        {
+            var objectId = new ObjectId(id);
+            var filter = Builders<TDocument>.Filter.Eq("_id", objectId);
+            return _collection.Find(filter).SingleOrDefaultAsync();
+        });
     }
 
     public virtual Task InsertAsync(TDocument document)

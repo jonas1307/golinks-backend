@@ -10,6 +10,7 @@ public interface IRepositoryBase<TDocument> where TDocument : class
     IEnumerable<TDocument> FilterBy(Expression<Func<TDocument, bool>> filterExpression);
     IEnumerable<TProjected> FilterBy<TProjected>(Expression<Func<TDocument, bool>> filterExpression, Expression<Func<TDocument, TProjected>> projectionExpression);
     Task<TDocument> FindAsync(Expression<Func<TDocument, bool>> filterExpression);
+    Task<TDocument> FindByIdAsync(string id);
     Task InsertAsync(TDocument document);
     Task InsertManyAsync(ICollection<TDocument> documents);
 }
