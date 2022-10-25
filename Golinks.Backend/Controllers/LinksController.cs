@@ -27,7 +27,7 @@ public class LinksController : Controller
     {
         var data = _linkRepository.AsQueryable();
 
-        var links = _mapper.Map<LinkViewModel>(data);
+        var links = _mapper.Map<IEnumerable<LinkViewModel>>(data);
 
         return Ok(links);
     }
