@@ -17,6 +17,9 @@ public static class MetricConfig
             cm.MapIdMember(c => c.Id)
                 .SetIdGenerator(new StringObjectIdGenerator())
                 .SetSerializer(new StringSerializer(BsonType.ObjectId));
+
+            cm.MapField(c => c.LinkId)
+                .SetSerializer(new StringSerializer(BsonType.ObjectId));
         });
     }
 }
