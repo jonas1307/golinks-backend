@@ -17,6 +17,7 @@ public static class ServiceCollectionExtension
 
         services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
         services.AddTransient<ILinkRepository, LinkRepository>();
+        services.AddTransient<IMetricRepository, MetricRepository>();
 
         services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
 
