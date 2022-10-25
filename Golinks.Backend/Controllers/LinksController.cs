@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Golinks.Application.Requests;
 using Golinks.Application.ViewModel;
 using Golinks.Domain.Entities;
 using Golinks.Repository.Contracts;
@@ -23,9 +24,12 @@ public class LinksController : Controller
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<LinkViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(IEnumerable<LinkViewModel>), StatusCodes.Status404NotFound)]
-    public IActionResult Index()
+    public IActionResult Index([FromQuery] LinkParams @params)
     {
-        var data = _linkRepository.AsQueryable();
+        var data = _linkRepository.AsQueryable()
+            .Skip((@params.PageNumber - 1) * @params.PageSize)
+            .Take(@params.PageSize)
+            .ToList();
 
         var links = _mapper.Map<IEnumerable<LinkViewModel>>(data);
 
