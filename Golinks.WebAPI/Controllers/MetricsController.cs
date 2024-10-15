@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
+using Golinks.Application.Contracts;
 using Golinks.Application.ViewModel;
 using Golinks.Domain.Entities;
-using Golinks.Repository.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Golinks.WebAPI.Controllers;
@@ -9,9 +9,9 @@ namespace Golinks.WebAPI.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class MetricsController(IMetricRepository metricRepository, IMapper mapper) : Controller
+public class MetricsController(IMetricService metricService, IMapper mapper) : Controller
 {
-    private readonly IMetricRepository _metricRepository = metricRepository;
+    private readonly IMetricService _metricService = metricService;
     private readonly IMapper _mapper = mapper;
 
     [HttpGet(Name = "GetAllMetrics")]
@@ -19,7 +19,7 @@ public class MetricsController(IMetricRepository metricRepository, IMapper mappe
     [ProducesResponseType(typeof(MetricViewModel), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Index()
     {
-        var data = await _metricRepository.FindAllAsync();
+        var data = await _metricService.FindAllAsync();
 
         var metrics = _mapper.Map<IEnumerable<MetricViewModel>>(data);
 
@@ -38,7 +38,7 @@ public class MetricsController(IMetricRepository metricRepository, IMapper mappe
 
         var metric = _mapper.Map<Metric>(model);
         
-        await _metricRepository.CreateAsync(metric);
+        await _metricService.CreateAsync(metric);
 
         return Ok(metric);
     }
