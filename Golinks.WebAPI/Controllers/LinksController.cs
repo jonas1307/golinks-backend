@@ -10,7 +10,7 @@ namespace Golinks.WebAPI.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class LinksController(ILinkService linkService, IMapper mapper) : Controller
+public class LinksController(ILinkService linkService, IMapper mapper) : ControllerBase
 {
     private readonly ILinkService _linkSerice = linkService;
     private readonly IMapper _mapper = mapper;
