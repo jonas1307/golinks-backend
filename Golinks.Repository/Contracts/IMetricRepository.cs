@@ -2,6 +2,6 @@
 
 namespace Golinks.Repository.Contracts;
 
-public interface IMetricRepository : IRepositoryBase<Metric>
+public interface IMetricRepository : IBaseRepository<Metric>
 {
 }

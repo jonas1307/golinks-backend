@@ -4,12 +4,12 @@ using System.Linq.Expressions;
 
 namespace Golinks.Repository.Repositories;
 
-public class RepositoryBase<TDocument> : IRepositoryBase<TDocument> where TDocument : class
+public class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocument : class
 {
     protected readonly GolinksContext _context;
     private readonly DbSet<TDocument> _dbSet;
 
-    public RepositoryBase(GolinksContext context)
+    public BaseRepository(GolinksContext context)
     {
         _context = context;
         _dbSet = _context.Set<TDocument>();

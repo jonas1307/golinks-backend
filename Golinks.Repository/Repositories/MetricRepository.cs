@@ -3,6 +3,6 @@ using Golinks.Repository.Contracts;
 
 namespace Golinks.Repository.Repositories;
 
-public class MetricRepository(GolinksContext context) : RepositoryBase<Metric>(context), IMetricRepository
+public class MetricRepository(GolinksContext context) : BaseRepository<Metric>(context), IMetricRepository
 {
 }

@@ -13,7 +13,7 @@ public static class ServiceCollectionExtension
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configuration);
 
-        services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
+        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         services.AddTransient<ILinkRepository, LinkRepository>();
         services.AddTransient<IMetricRepository, MetricRepository>();
 

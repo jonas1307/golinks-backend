@@ -2,7 +2,7 @@
 
 namespace Golinks.Repository.Contracts;
 
-public interface IRepositoryBase<TDocument> where TDocument : class
+public interface IBaseRepository<TDocument> where TDocument : class
 {
     Task CreateAsync(TDocument entity);
     Task DeleteAsync(TDocument entity);
