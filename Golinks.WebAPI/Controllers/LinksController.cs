@@ -20,7 +20,7 @@ public class LinksController(ILinkRepository linkRepository, IMapper mapper) : C
     [ProducesResponseType(typeof(IEnumerable<LinkViewModel>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
-        var data = await _linkRepository.FindAllWithPaginationAsync(@params.PageNumber, @params.PageSize);
+        var data = await _linkRepository.FindAllAsync(@params.PageNumber, @params.PageSize);
 
         var links = _mapper.Map<IEnumerable<LinkViewModel>>(data);
 

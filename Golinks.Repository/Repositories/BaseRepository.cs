@@ -20,13 +20,13 @@ public class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocum
         return await _dbSet.ToListAsync();
     }
 
-    public async Task<IList<TDocument>> FindAllWithPaginationAsync(int pageNumber, int pageSize)
+    public async Task<IList<TDocument>> FindAllAsync(int pageNumber, int pageSize)
     {
         return await _dbSet.Skip((pageNumber - 1) * pageSize)
             .Take(pageSize).ToListAsync();
     }
 
-    public async Task<IList<TDocument>> FindByConditionAsync(Expression<Func<TDocument, bool>> predicate)
+    public async Task<IList<TDocument>> FindAllAsync(Expression<Func<TDocument, bool>> predicate)
     {
         return await _dbSet.Where(predicate).ToListAsync();
     }
