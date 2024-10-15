@@ -2,7 +2,6 @@
 
 namespace Golinks.Repository.Contracts;
 
-public interface ILinkRepository : IRepositoryBase<Link>
+public interface ILinkRepository : IBaseRepository<Link>
 {
-
 }

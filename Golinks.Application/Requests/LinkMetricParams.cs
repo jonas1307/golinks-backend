@@ -1,6 +1,6 @@
 ﻿namespace Golinks.Application.Requests;
 
-public class LinkParams
+public class LinkMetricParams
 {
     private int MaxPageSize { get; } = 50;
 
@@ -19,4 +19,8 @@ public class LinkParams
             _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
         }
     }
+
+    public DateTime StartDate { get; set; } = DateTime.UtcNow.Date.AddDays(-6);
+    
+    public DateTime EndDate { get; set; } = DateTime.UtcNow.Date.AddDays(1).AddTicks(-1);
 }

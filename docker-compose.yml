@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  golinks.webapi:
+    image: ${DOCKER_REGISTRY-}golinkswebapi
+    build:
+      context: .
+      dockerfile: Golinks.WebAPI/Dockerfile
+    depends_on:
+      - golinks.sqlserver
+  
+  golinks.sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: golinks.sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Passw0rd
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      # - C:/containers/golinks_sql_data:/var/opt/mssql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  
+  golinks.adminer:
+    image: adminer:latest
+    container_name: golinks.adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - golinks.sqlserver
+

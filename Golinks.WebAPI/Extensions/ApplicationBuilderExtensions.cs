@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Golinks.Backend.Extensions;
+namespace Golinks.WebAPI.Extensions;
 
 [ExcludeFromCodeCoverage]
 public static class ApplicationBuilderExtensions
 {
     public static void UseSwaggerSetup(this IApplicationBuilder app)
     {
-        if (app == null) throw new ArgumentNullException(nameof(app));
+        ArgumentNullException.ThrowIfNull(app);
 
         app.UseSwagger();
         app.UseSwaggerUI(c =>

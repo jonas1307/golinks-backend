@@ -1,5 +1,5 @@
 using Golinks.Application.Extensions;
-using Golinks.Backend.Extensions;
+using Golinks.WebAPI.Extensions;
 using Golinks.Repository.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);

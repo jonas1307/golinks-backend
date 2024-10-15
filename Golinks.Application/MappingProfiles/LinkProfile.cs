@@ -11,6 +11,9 @@ public class LinkProfile : Profile
     public LinkProfile()
     {
         CreateMap<Link, LinkViewModel>();
-        CreateMap<LinkViewModel, Link>();
+
+        CreateMap<LinkViewModel, Link>()
+            .ForMember(x => x.Id, y => y.Ignore())
+            .ForMember(x => x.CreatedAt, y => y.Ignore());
     }
 }

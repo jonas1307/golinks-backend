@@ -1,9 +1,8 @@
 ﻿namespace Golinks.Domain.Entities;
 
-public class Metric
+public class Metric : BaseEntity
 {
+    public Guid LinkId { get; set; }
 
-    public string Id { get; set; }
-    public string LinkId { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public Link Link { get; set; }
 }

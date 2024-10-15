@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Golinks.Backend": {
+    "Golinks.WebAPI": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
