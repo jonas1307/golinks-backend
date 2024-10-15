@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace Golinks.Application.Services;
 
-public abstract class BaseService<TEntity>(IBaseRepository<TEntity> repository) : IBaseService<TEntity> where TEntity : class
+public class BaseService<TEntity>(IBaseRepository<TEntity> repository) : IBaseService<TEntity> where TEntity : class
 {
     private readonly IBaseRepository<TEntity> _repository = repository;
 
