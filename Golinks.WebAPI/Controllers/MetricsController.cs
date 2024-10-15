@@ -17,9 +17,9 @@ public class MetricsController(IMetricRepository metricRepository, IMapper mappe
     [HttpGet]
     [ProducesResponseType(typeof(MetricViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MetricViewModel), StatusCodes.Status400BadRequest)]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var data = _metricRepository.FindAllAsync();
+        var data = await _metricRepository.FindAllAsync();
 
         var metrics = _mapper.Map<IEnumerable<MetricViewModel>>(data);
 
