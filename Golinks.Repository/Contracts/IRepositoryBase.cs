@@ -5,11 +5,11 @@ namespace Golinks.Repository.Contracts;
 public interface IRepositoryBase<TDocument> where TDocument : class
 {
     Task CreateAsync(TDocument entity);
-    Task Delete(TDocument entity);
+    Task DeleteAsync(TDocument entity);
     Task<IList<TDocument>> FindAllAsync();
     Task<IList<TDocument>> FindAllWithPaginationAsync(int pageNumber, int pageSize);
     Task<IList<TDocument>> FindByConditionAsync(Expression<Func<TDocument, bool>> predicate);
     Task<TDocument> FindByIdAsync(Guid id);
     Task<TDocument> FindOneAsync(Expression<Func<TDocument, bool>> predicate);
-    Task Update(TDocument entity);
+    Task UpdateAsync(TDocument entity);
 }

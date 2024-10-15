@@ -47,14 +47,14 @@ public class RepositoryBase<TDocument> : IRepositoryBase<TDocument> where TDocum
         await _context.SaveChangesAsync();
     }
 
-    public async Task Update(TDocument entity)
+    public async Task UpdateAsync(TDocument entity)
     {
         _dbSet.Attach(entity);
         _context.Entry(entity).State = EntityState.Modified;
         await _context.SaveChangesAsync();
     }
 
-    public async Task Delete(TDocument entity)
+    public async Task DeleteAsync(TDocument entity)
     {
         _dbSet.Remove(entity);
         await _context.SaveChangesAsync();
