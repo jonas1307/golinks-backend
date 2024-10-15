@@ -14,7 +14,7 @@ public class MetricsController(IMetricRepository metricRepository, IMapper mappe
     private readonly IMetricRepository _metricRepository = metricRepository;
     private readonly IMapper _mapper = mapper;
 
-    [HttpGet]
+    [HttpGet(Name = "GetAllMetrics")]
     [ProducesResponseType(typeof(MetricViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MetricViewModel), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Index()
@@ -26,7 +26,7 @@ public class MetricsController(IMetricRepository metricRepository, IMapper mappe
         return Ok(metrics);
     }
 
-    [HttpPost]
+    [HttpPost(Name = "CreateNewMetric")]
     [ProducesResponseType(typeof(MetricViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MetricViewModel), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Post([FromBody] MetricViewModel model)
