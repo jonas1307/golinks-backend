@@ -1,9 +1,7 @@
-﻿namespace Golinks.Application.ViewModel
+﻿namespace Golinks.Application.ViewModel;
+
+public class MetricViewModel
 {
-    public class MetricViewModel
-    {
-        public Guid? Id { get; set; } = null;
-        public string LinkId { get; set; }
-        public DateTime? CreatedAt { get; set; }
-    }
+    public DateTime Date { get; set; }
+    public int Total { get; set; }
 }

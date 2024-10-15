@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
         services.AddTransient<ILinkService, LinkService>();
         services.AddTransient<IMetricService, MetricService>();
+        services.AddTransient<IActionService, ActionService>();
 
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     }
