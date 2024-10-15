@@ -15,7 +15,7 @@ public class LinksController(ILinkRepository linkRepository, IMapper mapper) : C
     private readonly ILinkRepository _linkRepository = linkRepository;
     private readonly IMapper _mapper = mapper;
 
-    [HttpGet]
+    [HttpGet(Name = "GetAllLinks")]
     [ProducesResponseType(typeof(IEnumerable<LinkViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(IEnumerable<LinkViewModel>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
@@ -27,7 +27,7 @@ public class LinksController(ILinkRepository linkRepository, IMapper mapper) : C
         return Ok(links);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "GetLinkById")]
     [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(IEnumerable<LinkViewModel>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Index(Guid id)
@@ -44,7 +44,7 @@ public class LinksController(ILinkRepository linkRepository, IMapper mapper) : C
         return Ok(link);
     }
 
-    [HttpPost]
+    [HttpPost(Name = "CreateNewLink")]
     [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] LinkViewModel model)
