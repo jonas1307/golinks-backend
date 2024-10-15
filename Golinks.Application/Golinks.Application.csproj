@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Golinks.Domain\Golinks.Domain.csproj" />
+    <ProjectReference Include="..\Golinks.Repository\Golinks.Repository.csproj" />
   </ItemGroup>
 
 </Project>
