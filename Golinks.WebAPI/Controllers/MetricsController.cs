@@ -4,7 +4,7 @@ using Golinks.Domain.Entities;
 using Golinks.Repository.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Golinks.Backend.Controllers;
+namespace Golinks.WebAPI.Controllers;
 
 [ApiController]
 [Route("[controller]")]

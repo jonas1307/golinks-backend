@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Golinks.Backend/Golinks.Backend.csproj", "Golinks.Backend/"]
-RUN dotnet restore "Golinks.Backend/Golinks.Backend.csproj"
+COPY ["Golinks.WebAPI/Golinks.WebAPI.csproj", "Golinks.WebAPI/"]
+RUN dotnet restore "Golinks.WebAPI/Golinks.WebAPI.csproj"
 COPY . .
-WORKDIR "/src/Golinks.Backend"
-RUN dotnet build "Golinks.Backend.csproj" -c Release -o /app/build
+WORKDIR "/src/Golinks.WebAPI"
+RUN dotnet build "Golinks.WebAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Golinks.Backend.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Golinks.WebAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Golinks.Backend.dll"]
+ENTRYPOINT ["dotnet", "Golinks.WebAPI.dll"]

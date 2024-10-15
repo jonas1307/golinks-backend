@@ -1,7 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Golinks.Backend.Extensions;
+namespace Golinks.WebAPI.Extensions;
 
 [ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions

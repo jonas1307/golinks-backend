@@ -1,11 +1,11 @@
 version: '3.4'
 
 services:
-  golinks.backend:
-    image: ${DOCKER_REGISTRY-}golinksbackend
+  golinks.webapi:
+    image: ${DOCKER_REGISTRY-}golinkswebapi
     build:
       context: .
-      dockerfile: Golinks.Backend/Dockerfile
+      dockerfile: Golinks.WebAPI/Dockerfile
     depends_on:
       - golinks.sqlserver
   
