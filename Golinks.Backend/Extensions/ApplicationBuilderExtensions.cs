@@ -7,7 +7,7 @@ public static class ApplicationBuilderExtensions
 {
     public static void UseSwaggerSetup(this IApplicationBuilder app)
     {
-        if (app == null) throw new ArgumentNullException(nameof(app));
+        ArgumentNullException.ThrowIfNull(app);
 
         app.UseSwagger();
         app.UseSwaggerUI(c =>

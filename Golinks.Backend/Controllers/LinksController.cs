@@ -10,36 +10,27 @@ namespace Golinks.Backend.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class LinksController : Controller
+public class LinksController(ILinkRepository linkRepository, IMapper mapper) : Controller
 {
-    private readonly ILinkRepository _linkRepository;
-    private readonly IMapper _mapper;
-
-    public LinksController(ILinkRepository linkRepository, IMapper mapper)
-    {
-        _linkRepository = linkRepository;
-        _mapper = mapper;
-    }
+    private readonly ILinkRepository _linkRepository = linkRepository;
+    private readonly IMapper _mapper = mapper;
 
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<LinkViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(IEnumerable<LinkViewModel>), StatusCodes.Status404NotFound)]
-    public IActionResult Index([FromQuery] LinkParams @params)
+    public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
-        var data = _linkRepository.AsQueryable()
-            .Skip((@params.PageNumber - 1) * @params.PageSize)
-            .Take(@params.PageSize)
-            .ToList();
+        var data = await _linkRepository.FindAllWithPaginationAsync(@params.PageNumber, @params.PageSize);
 
         var links = _mapper.Map<IEnumerable<LinkViewModel>>(data);
 
         return Ok(links);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(IEnumerable<LinkViewModel>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Index(string id)
+    public async Task<IActionResult> Index(Guid id)
     {
         var data = await _linkRepository.FindByIdAsync(id);
 
@@ -63,7 +54,7 @@ public class LinksController : Controller
             return BadRequest();
         }
 
-        var linkInDb = await _linkRepository.FindAsync(f => f.Alias == model.Alias);
+        var linkInDb = await _linkRepository.FindOneAsync(f => f.Slug == model.Slug);
 
         if (linkInDb != null)
         {
@@ -72,7 +63,7 @@ public class LinksController : Controller
 
         var link = _mapper.Map<Link>(model);
 
-        await _linkRepository.InsertAsync(link);
+        await _linkRepository.CreateAsync(link);
 
         return StatusCode(201, link);
     }

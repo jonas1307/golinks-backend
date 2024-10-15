@@ -1,69 +1,62 @@
 ﻿using Golinks.Repository.Contracts;
-using Golinks.Repository.Extensions.Settings;
-using MongoDB.Bson;
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Golinks.Repository.Repositories;
 
 public class RepositoryBase<TDocument> : IRepositoryBase<TDocument> where TDocument : class
 {
-    protected readonly IMongoCollection<TDocument> _collection;
+    protected readonly GolinksContext _context;
+    private readonly DbSet<TDocument> _dbSet;
 
-    public RepositoryBase(IMongoDbSettings settings)
+    public RepositoryBase(GolinksContext context)
     {
-        var database = new MongoClient(settings.ConnectionString).GetDatabase(settings.DatabaseName);
-        _collection = database.GetCollection<TDocument>(typeof(TDocument).Name);
+        _context = context;
+        _dbSet = _context.Set<TDocument>();
     }
 
-    public virtual IQueryable<TDocument> AsQueryable()
+    public async Task<IList<TDocument>> FindAllAsync()
     {
-        return _collection.AsQueryable();
+        return await _dbSet.ToListAsync();
     }
 
-    public virtual IEnumerable<TDocument> FilterBy(Expression<Func<TDocument, bool>> filterExpression)
+    public async Task<IList<TDocument>> FindAllWithPaginationAsync(int pageNumber, int pageSize)
     {
-        return _collection.Find(filterExpression).ToEnumerable();
+        return await _dbSet.Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize).ToListAsync();
     }
 
-    public virtual IEnumerable<TProjected> FilterBy<TProjected>(Expression<Func<TDocument, bool>> filterExpression,
-        Expression<Func<TDocument, TProjected>> projectionExpression)
+    public async Task<IList<TDocument>> FindByConditionAsync(Expression<Func<TDocument, bool>> predicate)
     {
-        return _collection.Find(filterExpression).Project(projectionExpression).ToEnumerable();
+        return await _dbSet.Where(predicate).ToListAsync();
     }
 
-    public virtual Task<TDocument> FindAsync(Expression<Func<TDocument, bool>> filterExpression)
+    public async Task<TDocument> FindByIdAsync(Guid id)
     {
-        return Task.Run(() => _collection.Find(filterExpression).FirstOrDefaultAsync());
+        return await _dbSet.FindAsync(id);
     }
 
-    public Task<TDocument> FindByIdAsync(string id)
+    public async Task<TDocument> FindOneAsync(Expression<Func<TDocument, bool>> predicate)
     {
-        return Task.Run(() =>
-        {
-            var objectId = new ObjectId(id);
-            var filter = Builders<TDocument>.Filter.Eq("_id", objectId);
-            return _collection.Find(filter).SingleOrDefaultAsync();
-        });
+        return await _dbSet.FirstOrDefaultAsync(predicate);
     }
 
-    public virtual Task InsertAsync(TDocument document)
+    public async Task CreateAsync(TDocument entity)
     {
-        return Task.Run(() => _collection.InsertOneAsync(document));
+        await _dbSet.AddAsync(entity);
+        await _context.SaveChangesAsync();
     }
 
-    public virtual async Task InsertManyAsync(ICollection<TDocument> documents)
+    public async Task Update(TDocument entity)
     {
-        await _collection.InsertManyAsync(documents);
+        _dbSet.Attach(entity);
+        _context.Entry(entity).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
     }
 
-    public Task DeleteAsync(Expression<Func<TDocument, bool>> filterExpression)
+    public async Task Delete(TDocument entity)
     {
-        return Task.Run(() => _collection.FindOneAndDeleteAsync(filterExpression));
-    }
-
-    public Task DeleteManyAsync(Expression<Func<TDocument, bool>> filterExpression)
-    {
-        return Task.Run(() => _collection.DeleteManyAsync(filterExpression));
+        _dbSet.Remove(entity);
+        await _context.SaveChangesAsync();
     }
 }

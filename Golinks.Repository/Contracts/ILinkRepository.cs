@@ -4,5 +4,4 @@ namespace Golinks.Repository.Contracts;
 
 public interface ILinkRepository : IRepositoryBase<Link>
 {
-
 }

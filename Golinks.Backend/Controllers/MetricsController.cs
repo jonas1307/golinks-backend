@@ -9,23 +9,17 @@ namespace Golinks.Backend.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class MetricsController : Controller
+public class MetricsController(IMetricRepository metricRepository, IMapper mapper) : Controller
 {
-    private readonly IMetricRepository _metricRepository;
-    private readonly IMapper _mapper;
-
-    public MetricsController(IMetricRepository metricRepository, IMapper mapper)
-    {
-        _metricRepository = metricRepository;
-        _mapper = mapper;
-    }
+    private readonly IMetricRepository _metricRepository = metricRepository;
+    private readonly IMapper _mapper = mapper;
 
     [HttpGet]
     [ProducesResponseType(typeof(MetricViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MetricViewModel), StatusCodes.Status400BadRequest)]
     public IActionResult Index()
     {
-        var data = _metricRepository.AsQueryable().ToList();
+        var data = _metricRepository.FindAllAsync();
 
         var metrics = _mapper.Map<IEnumerable<MetricViewModel>>(data);
 
@@ -44,7 +38,7 @@ public class MetricsController : Controller
 
         var metric = _mapper.Map<Metric>(model);
         
-        await _metricRepository.InsertAsync(metric);
+        await _metricRepository.CreateAsync(metric);
 
         return Ok(metric);
     }
