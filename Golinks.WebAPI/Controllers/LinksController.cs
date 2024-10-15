@@ -69,7 +69,7 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     }
 
     [HttpPut("{id:guid}", Name = "UpdateLink")]
-    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status202Accepted)]
     public async Task<IActionResult> Update(Guid id, [FromBody] LinkViewModel model)
     {
         var linkInDb = await _linkSerice.FindOneAsync(x => x.Slug == model.Slug);
