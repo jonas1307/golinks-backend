@@ -1,8 +1,7 @@
 ﻿using Golinks.Domain.Entities;
 
-namespace Golinks.Application.Contracts
+namespace Golinks.Application.Contracts;
+
+public interface IMetricService : IBaseService<Metric>
 {
-    public interface IMetricService : IBaseService<Metric>
-    {
-    }
 }

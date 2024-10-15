@@ -2,9 +2,8 @@
 using Golinks.Domain.Entities;
 using Golinks.Repository.Contracts;
 
-namespace Golinks.Application.Services
+namespace Golinks.Application.Services;
+
+public class LinkService(IBaseRepository<Link> repository) : BaseService<Link>(repository), ILinkService
 {
-    public class LinkService(IBaseRepository<Link> repository) : BaseService<Link>(repository), ILinkService
-    {
-    }
 }
