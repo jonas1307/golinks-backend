@@ -30,7 +30,7 @@ public class LinksController(ILinkRepository linkRepository, IMapper mapper) : C
     [HttpGet("{id:guid}", Name = "GetLinkById")]
     [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(IEnumerable<LinkViewModel>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Index(Guid id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         var data = await _linkRepository.FindByIdAsync(id);
 
@@ -44,7 +44,7 @@ public class LinksController(ILinkRepository linkRepository, IMapper mapper) : C
         return Ok(link);
     }
 
-    [HttpPost(Name = "CreateNewLink")]
+    [HttpPost(Name = "CreateLink")]
     [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] LinkViewModel model)
@@ -65,6 +65,47 @@ public class LinksController(ILinkRepository linkRepository, IMapper mapper) : C
 
         await _linkRepository.CreateAsync(link);
 
-        return StatusCode(201, link);
+        return CreatedAtAction(nameof(GetById), new { id = link.Id }, link);
+    }
+
+    [HttpPut("{id:guid}", Name = "UpdateLink")]
+    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Update(Guid id, [FromBody] LinkViewModel model)
+    {
+        var linkInDb = await _linkRepository.FindOneAsync(x => x.Slug == model.Slug);
+
+        if (linkInDb?.Id != id)
+        {
+            return BadRequest(new { Error = "Slug already in use" });
+        }
+
+        linkInDb = await _linkRepository.FindByIdAsync(id);
+
+        if (linkInDb == null)
+        {
+            return BadRequest();
+        }
+
+        var link = _mapper.Map(model, linkInDb);
+
+        await _linkRepository.UpdateAsync(link);
+
+        return AcceptedAtAction(nameof(GetById), new { id = link.Id }, link);
+    }
+
+    [HttpDelete("{id:guid}", Name = "DeleteLink")]
+    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status202Accepted)]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var linkInDb = await _linkRepository.FindByIdAsync(id);
+
+        if (linkInDb == null)
+        {
+            return BadRequest();
+        }
+
+        await _linkRepository.DeleteAsync(linkInDb);
+
+        return AcceptedAtAction(nameof(GetById), new { id = linkInDb.Id }, linkInDb);
     }
 }
