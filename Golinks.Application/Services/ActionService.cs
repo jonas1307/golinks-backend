@@ -42,6 +42,6 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
             link.Metrics.Add(viewModel);
         }
 
-        return result;
+        return result.OrderByDescending(o => o.CreatedAt);
     }
 }
