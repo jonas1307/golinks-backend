@@ -7,5 +7,5 @@ public class LinkMetricViewModel
     public string Slug { get; set; }
     public string Description { get; set; }
     public DateTime? CreatedAt { get; set; }
-    public IEnumerable<MetricViewModel> Metrics { get; set; }
+    public List<MetricViewModel> Metrics { get; set; }
 }

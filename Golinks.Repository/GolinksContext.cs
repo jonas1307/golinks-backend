@@ -8,6 +8,7 @@ namespace Golinks.Repository;
 public class GolinksContext(DbContextOptions<GolinksContext> options) : DbContext(options)
 {
     public DbSet<Link> Links { get; set; }
+    public DbSet<Metric> Metrics { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Golinks.Application.ViewModel;
+using Golinks.Domain.DTOs;
 using Golinks.Domain.Entities;
 using System.Diagnostics.CodeAnalysis;
 
@@ -11,9 +12,12 @@ public class LinkProfile : Profile
     public LinkProfile()
     {
         CreateMap<Link, LinkViewModel>();
+        CreateMap<Link, LinkMetricViewModel>();
 
         CreateMap<LinkViewModel, Link>()
             .ForMember(x => x.Id, y => y.Ignore())
             .ForMember(x => x.CreatedAt, y => y.Ignore());
+
+        CreateMap<MetricDTO, MetricViewModel>();
     }
 }
