@@ -2,6 +2,6 @@
 
 public class MetricViewModel
 {
-    public DateTime Date { get; set; }
+    public string Date { get; set; }
     public int TotalClicks { get; set; }
 }

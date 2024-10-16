@@ -18,6 +18,7 @@ public class LinkProfile : Profile
             .ForMember(x => x.Id, y => y.Ignore())
             .ForMember(x => x.CreatedAt, y => y.Ignore());
 
-        CreateMap<MetricDTO, MetricViewModel>();
+        CreateMap<MetricDTO, MetricViewModel>()
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date.ToString("yyyy/MM/dd")));
     }
 }
