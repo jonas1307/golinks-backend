@@ -6,6 +6,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.UseKestrel(option => option.AddServerHeader = false);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddAutoMapperConfiguration();
 builder.Services.RegisterRepositoryServices(builder.Configuration);
 
@@ -21,6 +31,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerSetup();
 }
+
+app.UseCors("AllowAllOrigins");
 
 app.UseHttpsRedirection();
 
