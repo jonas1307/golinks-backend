@@ -27,6 +27,21 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
 
     public async Task<IEnumerable<LinkMetricViewModel>> GetLinksWithMetrics(LinkMetricParams @params)
     {
-        throw new NotImplementedException();
+        var links = await _linkRepository.FindAllAsync(@params.PageNumber, @params.PageSize);
+
+        var metrics = await _metricRepository.GetByLinks(links.Select(s => s.Id), @params.StartDate, @params.EndDate);
+
+        var result = _mapper.Map<IEnumerable<LinkMetricViewModel>>(links);
+
+        foreach (var metric in metrics)
+        {
+            var viewModel = _mapper.Map<MetricViewModel>(metric);
+
+            var link = result.First(x => x.Id == metric.LinkId);
+
+            link.Metrics.Add(viewModel);
+        }
+
+        return result;
     }
 }
