@@ -26,7 +26,7 @@ jobs:
 
       - name: dotnet publish
         run: dotnet publish ./Golinks.WebAPI/Golinks.WebAPI.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
+      
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -47,6 +47,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+
+      - name: Apply Replace Tokens
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["**/appsettings.Production.json"]'
+        env:
+          DefaultConnectionString: ${{ secrets.DEFAULTCONNECTIONSTRING }}
       
       - name: Login to Azure
         uses: azure/login@v2
