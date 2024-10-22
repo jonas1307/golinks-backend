@@ -16,7 +16,7 @@ public sealed class GolinksContextFactory : IDesignTimeDbContextFactory<GolinksC
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         var optionsBuilder = new DbContextOptionsBuilder<GolinksContext>();
-        optionsBuilder.UseSqlServer(connectionString);
+        optionsBuilder.UseNpgsql(connectionString);
 
         return new GolinksContext(optionsBuilder.Options);
     }

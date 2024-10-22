@@ -18,6 +18,6 @@ public static class ServiceCollectionExtension
         services.AddTransient<IMetricRepository, MetricRepository>();
 
         services.AddDbContext<GolinksContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
     }
 }
