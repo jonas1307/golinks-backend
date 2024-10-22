@@ -7,20 +7,17 @@ services:
       context: .
       dockerfile: Golinks.WebAPI/Dockerfile
     depends_on:
-      - golinks.sqlserver
+      - golinks.postgres
   
-  golinks.sqlserver:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: golinks.sqlserver
+  golinks.postgres:
+    image: postgres:11
+    container_name: golinks.postgres
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrong!Passw0rd
-      - MSSQL_PID=Developer
+      POSTGRES_USER: golinks_app_user
+      POSTGRES_PASSWORD: YourStrong!Passw0rd
+      POSTGRES_DB: golinks
     ports:
-      - "1433:1433"
-    volumes:
-      # - C:/containers/golinks_sql_data:/var/opt/mssql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - "5432:5432"
   
   golinks.adminer:
     image: adminer:latest
@@ -28,5 +25,5 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - golinks.sqlserver
+      - golinks.postgres
 
