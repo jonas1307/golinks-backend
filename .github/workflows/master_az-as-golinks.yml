@@ -22,11 +22,11 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build ./Golinks.WebAPI/Golinks.WebAPI.csproj --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish ./Golinks.WebAPI/Golinks.WebAPI.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
-      
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -47,20 +47,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-
-      - name: Apply Replace Tokens
-        uses: cschleiden/replace-tokens@v1
-        with:
-          files: '["**/appsettings.Production.json"]'
-        env:
-          DefaultConnectionString: ${{ secrets.DEFAULTCONNECTIONSTRING }}
       
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B398D3611FC4414E9D42CD75CA918A7F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8E2446953E204AD7B63DBEA7C033C0C6 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_74BD151DAC1B4151A964BED4CD9165C6 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_58995F38C0CB4A56A390F0AC24C9FAF5 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B0FF7EFA88DC4EF182EAB9D2D0502C7C }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_2A3693A629AD435DA42796EFBB96BE1D }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
