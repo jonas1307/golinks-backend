@@ -52,6 +52,8 @@ jobs:
         uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/appsettings.Production.json"]'
+        env:
+          DefaultConnectionString: ${{ secrets.DEFAULTCONNECTIONSTRING }}
       
       - name: Login to Azure
         uses: azure/login@v2
