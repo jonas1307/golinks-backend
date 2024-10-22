@@ -10,7 +10,7 @@ services:
       - golinks.postgres
   
   golinks.postgres:
-    image: postgres:11
+    image: postgres:16.4
     container_name: golinks.postgres
     environment:
       POSTGRES_USER: golinks_app_user
