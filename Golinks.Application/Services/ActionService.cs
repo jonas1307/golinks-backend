@@ -13,19 +13,23 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
     private readonly IMetricRepository _metricRepository = metricRepository;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<LinkViewModel> RegisterAccess(string slug)
+    public async Task<RestResponse<LinkViewModel>> RegisterAccess(string slug)
     {
-        var link = await _linkRepository.FindOneAsync(x => x.Slug == slug)
-            ?? throw new Exception("Invalid Slug");
+        var link = await _linkRepository.FindOneAsync(x => x.Slug == slug);
+
+        if (link == null) 
+        {
+            return RestResponse<LinkViewModel>.Error("No link was found with the given slug.");
+        }
 
         var metric = new Metric { LinkId = link.Id };
 
         await _metricRepository.CreateAsync(metric);
 
-        return _mapper.Map<LinkViewModel>(link);
+        return RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
     }
 
-    public async Task<IEnumerable<LinkMetricViewModel>> GetLinksWithMetrics(LinkMetricParams @params)
+    public async Task<RestResponse<IEnumerable<LinkMetricViewModel>>> GetLinksWithMetrics(LinkMetricParams @params)
     {
         var links = await _linkRepository.FindAllAsync(@params.PageNumber, @params.PageSize);
 
@@ -42,6 +46,8 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
             link.Metrics.Add(viewModel);
         }
 
-        return result.OrderByDescending(o => o.CreatedAt);
+        result = result.OrderByDescending(o => o.CreatedAt);
+
+        return RestResponse<IEnumerable<LinkMetricViewModel>>.Success(result);
     }
 }
