@@ -12,7 +12,7 @@ public class ActionsController(IActionService actionService) : ControllerBase
 {
     private readonly IActionService _actionService = actionService;
 
-    [HttpGet("RegisterAccess/{slug:alpha}", Name = "RegisterAccess")]
+    [HttpGet("RegisterAccess/{slug}", Name = "RegisterAccess")]
     [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> RegisterAccess(string slug)
     {
