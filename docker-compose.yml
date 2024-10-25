@@ -8,7 +8,9 @@ services:
       dockerfile: Golinks.WebAPI/Dockerfile
     depends_on:
       - golinks.postgres
-  
+    networks:
+      - golinks_network
+
   golinks.postgres:
     image: postgres:16.4
     container_name: golinks.postgres
@@ -18,7 +20,11 @@ services:
       POSTGRES_DB: golinks
     ports:
       - "5432:5432"
-  
+    networks:
+      - golinks_network
+    volumes:
+      - golinks_postgres:/var/lib/postgresql/data
+
   golinks.adminer:
     image: adminer:latest
     container_name: golinks.adminer
@@ -26,4 +32,13 @@ services:
       - "8080:8080"
     depends_on:
       - golinks.postgres
+    networks:
+      - golinks_network
 
+networks:
+  golinks_network:
+    driver: bridge
+
+volumes:
+  golinks_postgres:
+  
