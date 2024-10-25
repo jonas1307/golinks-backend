@@ -3,10 +3,12 @@ using Golinks.Application.Contracts;
 using Golinks.Application.Requests;
 using Golinks.Application.ViewModel;
 using Golinks.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Golinks.WebAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
