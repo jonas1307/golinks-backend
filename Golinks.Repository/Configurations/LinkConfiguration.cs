@@ -27,6 +27,10 @@ public class LinkConfiguration : IEntityTypeConfiguration<Link>
         builder.Property(x => x.CreatedAt)
             .IsRequired();
 
+        builder.Property(x => x.TotalUsage)
+            .HasDefaultValue(0)
+            .IsRequired();
+
         builder.HasIndex(x => x.Slug)
             .IsUnique();
     }
