@@ -8,7 +8,7 @@ public class LinkRepository(GolinksContext context) : BaseRepository<Link>(conte
 {
     public async Task<IList<Link>> AllLinksByMostPopularAsync(int pageNumber, int pageSize)
     {
-        return await _context.Links.OrderBy(x => x.TotalUsage).Skip((pageNumber - 1) * pageSize)
+        return await _context.Links.OrderByDescending(x => x.TotalUsage).Skip((pageNumber - 1) * pageSize)
         .Take(pageSize).ToListAsync();
     }
 }
