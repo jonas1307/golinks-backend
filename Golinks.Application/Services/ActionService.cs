@@ -46,8 +46,6 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
             link.Metrics.Add(viewModel);
         }
 
-        result = result.OrderByDescending(o => o.CreatedAt);
-
         return RestResponse<IEnumerable<LinkMetricViewModel>>.Success(result);
     }
 }
