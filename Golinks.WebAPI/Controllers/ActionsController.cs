@@ -19,9 +19,14 @@ public class ActionsController(IActionService actionService) : ControllerBase
     [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> RegisterAccess(string slug)
     {
-        var link = await _actionService.RegisterAccess(slug);
+        var response = await _actionService.RegisterAccess(slug);
 
-        return Ok(link);
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+
+        return BadRequest(response);
     }
 
     [AllowAnonymous]

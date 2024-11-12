@@ -22,6 +22,10 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
             return RestResponse<LinkViewModel>.Error("No link was found with the given slug.");
         }
 
+        link.RegisterUsage();
+
+        await _linkRepository.UpdateAsync(link);
+
         var metric = new Metric { LinkId = link.Id };
 
         await _metricRepository.CreateAsync(metric);
@@ -31,7 +35,7 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
 
     public async Task<RestResponse<IEnumerable<LinkMetricViewModel>>> GetLinksWithMetrics(LinkMetricParams @params)
     {
-        var links = await _linkRepository.FindAllAsync(@params.PageNumber, @params.PageSize);
+        var links = await _linkRepository.AllLinksByMostPopularAsync(@params.PageNumber, @params.PageSize);
 
         var metrics = await _metricRepository.GetByLinks(links.Select(s => s.Id), @params.StartDate, @params.EndDate);
 
@@ -45,8 +49,6 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
 
             link.Metrics.Add(viewModel);
         }
-
-        result = result.OrderByDescending(o => o.CreatedAt);
 
         return RestResponse<IEnumerable<LinkMetricViewModel>>.Success(result);
     }

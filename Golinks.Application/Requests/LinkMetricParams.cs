@@ -20,7 +20,7 @@ public class LinkMetricParams
         }
     }
 
-    public DateTime StartDate { get; set; } = DateTime.UtcNow.Date.AddDays(-6);
+    public DateTime StartDate { get; set; } = DateTime.UtcNow.Date.AddDays(-30);
     
     public DateTime EndDate { get; set; } = DateTime.UtcNow.Date.AddDays(1).AddTicks(-1);
 }
