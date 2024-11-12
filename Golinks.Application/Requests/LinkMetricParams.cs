@@ -20,7 +20,19 @@ public class LinkMetricParams
         }
     }
 
-    public DateTime StartDate { get; set; } = DateTime.UtcNow.Date.AddDays(-30);
-    
-    public DateTime EndDate { get; set; } = DateTime.UtcNow.Date.AddDays(1).AddTicks(-1);
+    private int MaxMetricRange { get; } = 120;
+
+    private int _metricRange = 30;
+
+    public int MetricRange
+    {
+        get
+        {
+            return _metricRange;
+        }
+        set
+        {
+            _metricRange = (value > MaxMetricRange) ? MaxMetricRange : value;
+        }
+    }
 }

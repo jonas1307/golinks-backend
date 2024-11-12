@@ -37,7 +37,11 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
     {
         var links = await _linkRepository.AllLinksByMostPopularAsync(@params.PageNumber, @params.PageSize);
 
-        var metrics = await _metricRepository.GetByLinks(links.Select(s => s.Id), @params.StartDate, @params.EndDate);
+        var startDate = DateTime.UtcNow.Date.AddDays(@params.MetricRange * -1);
+        
+        var endDate = DateTime.UtcNow.Date.AddDays(1).AddTicks(-1);
+
+        var metrics = await _metricRepository.GetByLinks(links.Select(s => s.Id), startDate, endDate);
 
         var result = _mapper.Map<IEnumerable<LinkMetricViewModel>>(links);
 
