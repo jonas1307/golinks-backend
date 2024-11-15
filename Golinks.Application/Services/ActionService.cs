@@ -33,9 +33,9 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
         return RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
     }
 
-    public async Task<RestResponse<IEnumerable<LinkMetricViewModel>>> GetLinksWithMetrics(LinkMetricParams @params)
+    public async Task<RestResponse<IEnumerable<LinkMetricViewModel>>> GetLinksWithMetrics(LinkMetricParams @params, string baseUrl)
     {
-        var links = await _linkRepository.AllLinksByMostPopularAsync(@params.PageNumber, @params.PageSize);
+        var (links, totalItems) = await _linkRepository.AllLinksByMostPopularAsync(@params.PageNumber, @params.PageSize);
 
         var startDate = DateTime.UtcNow.Date.AddDays(@params.MetricRange * -1);
         
@@ -54,6 +54,6 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
             link.Metrics.Add(viewModel);
         }
 
-        return RestResponse<IEnumerable<LinkMetricViewModel>>.Success(result);
+        return RestResponse<IEnumerable<LinkMetricViewModel>>.Success(result, baseUrl, @params.PageNumber, @params.PageSize, totalItems);
     }
 }

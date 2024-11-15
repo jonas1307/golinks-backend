@@ -34,7 +34,9 @@ public class ActionsController(IActionService actionService) : ControllerBase
     [ProducesResponseType(typeof(RestResponse<IEnumerable<LinkMetricViewModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLinksWithMetrics([FromQuery] LinkMetricParams @params)
     {
-        var links = await _actionService.GetLinksWithMetrics(@params);
+        var url = Url.Action("GetLinksWithMetrics", "Actions", null, Request.Scheme);
+        
+        var links = await _actionService.GetLinksWithMetrics(@params, url);
 
         return Ok(links);
     }

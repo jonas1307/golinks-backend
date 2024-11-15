@@ -21,9 +21,11 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     [ProducesResponseType(typeof(RestResponse<IEnumerable<LinkViewModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
-        var data = await _linkSerice.FindAllAsync(@params.PageNumber, @params.PageSize);
+        var (data, totalItems) = await _linkSerice.FindAllAsync(@params.PageNumber, @params.PageSize);
 
-        var result = RestResponse<IEnumerable<LinkViewModel>>.Success(_mapper.Map<IEnumerable<LinkViewModel>>(data));
+        var url = Url.Action("Index", "Links", null, Request.Scheme);
+
+        var result = RestResponse<IEnumerable<LinkViewModel>>.Success(_mapper.Map<IEnumerable<LinkViewModel>>(data), url, @params.PageNumber, @params.PageSize, totalItems);
 
         return Ok(result);
     }

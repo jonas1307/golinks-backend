@@ -5,6 +5,6 @@ namespace Golinks.Application.Contracts;
 
 public interface IActionService
 {
-    Task<RestResponse<IEnumerable<LinkMetricViewModel>>> GetLinksWithMetrics(LinkMetricParams @params);
+    Task<RestResponse<IEnumerable<LinkMetricViewModel>>> GetLinksWithMetrics(LinkMetricParams @params, string baseUrl);
     Task<RestResponse<LinkViewModel>> RegisterAccess(string slug);
 }

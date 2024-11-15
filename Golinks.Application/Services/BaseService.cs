@@ -23,7 +23,7 @@ public class BaseService<TEntity>(IBaseRepository<TEntity> repository) : IBaseSe
         return await _repository.FindAllAsync();
     }
 
-    public async Task<IList<TEntity>> FindAllAsync(int pageNumber, int pageSize)
+    public async Task<(IList<TEntity>, int)> FindAllAsync(int pageNumber, int pageSize)
     {
         return await _repository.FindAllAsync(pageNumber, pageSize);
     }

@@ -20,10 +20,14 @@ public class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocum
         return await _dbSet.ToListAsync();
     }
 
-    public async Task<IList<TDocument>> FindAllAsync(int pageNumber, int pageSize)
+    public async Task<(IList<TDocument>, int)> FindAllAsync(int pageNumber, int pageSize)
     {
-        return await _dbSet.Skip((pageNumber - 1) * pageSize)
+        var data = await _dbSet.Skip((pageNumber - 1) * pageSize)
             .Take(pageSize).ToListAsync();
+
+        var count = await _dbSet.CountAsync();
+
+        return (data, count);
     }
 
     public async Task<IList<TDocument>> FindAllAsync(Expression<Func<TDocument, bool>> predicate)
