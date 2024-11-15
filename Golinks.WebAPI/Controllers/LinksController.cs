@@ -3,6 +3,7 @@ using Golinks.Application.Contracts;
 using Golinks.Application.Requests;
 using Golinks.Application.ViewModel;
 using Golinks.Domain.Entities;
+using Golinks.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,6 +49,7 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     }
 
     [HttpPost(Name = "CreateLink")]
+    [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
     [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] LinkViewModel model)
@@ -74,6 +76,7 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     }
 
     [HttpPut("{id:guid}", Name = "UpdateLink")]
+    [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
     [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status202Accepted)]
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(Guid id, [FromBody] LinkViewModel model)
@@ -102,6 +105,7 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     }
 
     [HttpDelete("{id:guid}", Name = "DeleteLink")]
+    [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status202Accepted)]
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Delete(Guid id)

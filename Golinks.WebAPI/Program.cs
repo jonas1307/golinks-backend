@@ -32,6 +32,18 @@ builder.Services.AddAuthentication(options =>
     options.Audience = builder.Configuration["Auth0:Audience"];
 });
 
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("PermissionPolicy", policy =>
+        policy.RequireAssertion(context =>
+        {
+            var userPermissions = context.User.FindFirst("permissions")?.Value;
+            if (string.IsNullOrEmpty(userPermissions))
+                return false;
+
+            var requiredPermission = context.Resource as string;
+            return userPermissions.Split(',').Contains(requiredPermission);
+        }));
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSwaggerConfiguration();
 
