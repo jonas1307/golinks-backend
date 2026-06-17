@@ -16,23 +16,26 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
 
     public async Task<RestResponse<LinkViewModel>> RegisterAccess(string slug)
     {
+        var link = await _linkRepository.FindOneAsync(x => x.Slug == slug);
+
+        if (link == null)
+        {
+            return RestResponse<LinkViewModel>.Error("No link was found with the given slug.");
+        }
+
         await _unitOfWork.BeginTransactionAsync();
 
         try
         {
-            var link = await _linkRepository.IncrementUsageAsync(slug);
-
-            if (link == null)
-            {
-                await _unitOfWork.RollbackAsync();
-                return RestResponse<LinkViewModel>.Error("No link was found with the given slug.");
-            }
+            await _linkRepository.IncrementUsageAsync(slug);
 
             var metric = new Metric { LinkId = link.Id };
 
             await _metricRepository.CreateAsync(metric);
 
             await _unitOfWork.CommitAsync();
+
+            link.TotalUsage += 1;
 
             return RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
         }

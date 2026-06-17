@@ -41,6 +41,7 @@ public class GolinksContext(DbContextOptions<GolinksContext> options) : DbContex
 
     public async Task CommitAsync()
     {
+        if (_currentTransaction == null) return;
         await _currentTransaction.CommitAsync();
         await _currentTransaction.DisposeAsync();
         _currentTransaction = null;
@@ -48,6 +49,7 @@ public class GolinksContext(DbContextOptions<GolinksContext> options) : DbContex
 
     public async Task RollbackAsync()
     {
+        if (_currentTransaction == null) return;
         await _currentTransaction.RollbackAsync();
         await _currentTransaction.DisposeAsync();
         _currentTransaction = null;

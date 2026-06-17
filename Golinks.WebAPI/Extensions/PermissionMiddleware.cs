@@ -11,13 +11,18 @@ public class PermissionMiddleware(RequestDelegate next)
 
         if (requiredPermission != null)
         {
+            if (context.User.Identity?.IsAuthenticated != true)
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return;
+            }
+
             var userPermissions = context.User.FindFirst("permissions")?.Value;
-            
+
             if (string.IsNullOrEmpty(userPermissions) || !userPermissions.Split(',').Contains(requiredPermission))
             {
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
                 await context.Response.WriteAsync("Forbidden: You don't have the required permission.");
-                
                 return;
             }
         }
