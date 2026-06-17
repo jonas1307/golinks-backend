@@ -16,7 +16,7 @@ public class LinkMetricParams
         }
         set
         {
-            _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
+            _pageSize = value < 1 ? 1 : (value > MaxPageSize) ? MaxPageSize : value;
         }
     }
 

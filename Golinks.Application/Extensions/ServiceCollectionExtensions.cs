@@ -13,9 +13,9 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services, nameof(services));
 
         services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
-        services.AddTransient<ILinkService, LinkService>();
-        services.AddTransient<IMetricService, MetricService>();
-        services.AddTransient<IActionService, ActionService>();
+        services.AddScoped<ILinkService, LinkService>();
+        services.AddScoped<IMetricService, MetricService>();
+        services.AddScoped<IActionService, ActionService>();
 
         services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
     }

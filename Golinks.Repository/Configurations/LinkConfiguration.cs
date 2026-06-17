@@ -14,15 +14,14 @@ public class LinkConfiguration : IEntityTypeConfiguration<Link>
 
         builder.Property(x => x.Url)
             .IsRequired()
-            .HasMaxLength(1024);
+            .HasMaxLength(2048);
 
         builder.Property(x => x.Slug)
             .IsRequired()
-            .HasMaxLength(255);
+            .HasMaxLength(100);
 
         builder.Property(x => x.Description)
-            .IsRequired()
-            .HasMaxLength(255);
+            .HasMaxLength(500);
 
         builder.Property(x => x.CreatedAt)
             .IsRequired();

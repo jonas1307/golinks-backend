@@ -33,9 +33,9 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
 
             await _metricRepository.CreateAsync(metric);
 
-            await _unitOfWork.CommitAsync();
-
             link.TotalUsage += 1;
+
+            await _unitOfWork.CommitAsync();
 
             return RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
         }

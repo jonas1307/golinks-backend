@@ -14,7 +14,5 @@ public static class ApplicationBuilderExtensions
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
         });
-
-        app.UseMiddleware<PermissionMiddleware>();
     }
 }

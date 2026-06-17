@@ -14,8 +14,8 @@ public static class ServiceCollectionExtension
         ArgumentNullException.ThrowIfNull(configuration);
 
         services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-        services.AddTransient<ILinkRepository, LinkRepository>();
-        services.AddTransient<IMetricRepository, MetricRepository>();
+        services.AddScoped<ILinkRepository, LinkRepository>();
+        services.AddScoped<IMetricRepository, MetricRepository>();
 
         services.AddDbContext<GolinksContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
