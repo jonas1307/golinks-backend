@@ -1,4 +1,4 @@
-namespace Golinks.Repository.Contracts;
+namespace Golinks.Domain;
 
 public interface IUnitOfWork
 {

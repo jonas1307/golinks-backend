@@ -15,14 +15,14 @@ namespace Golinks.WebAPI.Controllers;
 [Produces("application/json")]
 public class LinksController(ILinkService linkService, IMapper mapper) : ControllerBase
 {
-    private readonly ILinkService _linkSerice = linkService;
+    private readonly ILinkService _linkService = linkService;
     private readonly IMapper _mapper = mapper;
 
     [HttpGet(Name = "GetAllLinks")]
     [ProducesResponseType(typeof(RestResponse<IEnumerable<LinkViewModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
-        var (data, totalItems) = await _linkSerice.FindAllAsync(@params.PageNumber, @params.PageSize);
+        var (data, totalItems) = await _linkService.FindAllAsync(@params.PageNumber, @params.PageSize);
 
         var url = Url.Action("Index", "Links", null, Request.Scheme);
 
@@ -36,7 +36,7 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var data = await _linkSerice.FindByIdAsync(id);
+        var data = await _linkService.FindByIdAsync(id);
 
         if (data == null)
         {
@@ -59,7 +59,7 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
             return BadRequest(RestResponse<object>.Error("The request is invalid."));
         }
 
-        var linkInDb = await _linkSerice.FindOneAsync(f => f.Slug == model.Slug);
+        var linkInDb = await _linkService.FindOneAsync(f => f.Slug == model.Slug);
 
         if (linkInDb != null)
         {
@@ -68,7 +68,7 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
 
         var link = _mapper.Map<Link>(model);
 
-        await _linkSerice.CreateAsync(link);
+        await _linkService.CreateAsync(link);
 
         var result = RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
 
@@ -81,14 +81,14 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(Guid id, [FromBody] LinkViewModel model)
     {
-        var linkWithSameSlug = await _linkSerice.FindOneAsync(x => x.Slug == model.Slug);
+        var linkWithSameSlug = await _linkService.FindOneAsync(x => x.Slug == model.Slug);
 
         if (linkWithSameSlug != null && linkWithSameSlug.Id != id)
         {
             return BadRequest(RestResponse<object>.Error("Slug already in use."));
         }
 
-        var linkInDb = await _linkSerice.FindByIdAsync(id);
+        var linkInDb = await _linkService.FindByIdAsync(id);
 
         if (linkInDb == null)
         {
@@ -97,7 +97,7 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
 
         var link = _mapper.Map(model, linkInDb);
 
-        await _linkSerice.UpdateAsync(link);
+        await _linkService.UpdateAsync(link);
 
         var result = RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
 
@@ -110,14 +110,14 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var linkInDb = await _linkSerice.FindByIdAsync(id);
+        var linkInDb = await _linkService.FindByIdAsync(id);
 
         if (linkInDb == null)
         {
             return BadRequest(RestResponse<object>.Error($"Link with ID {id} was not found."));
         }
 
-        await _linkSerice.DeleteAsync(linkInDb);
+        await _linkService.DeleteAsync(linkInDb);
 
         var result = RestResponse<object>.Success(new { });
 

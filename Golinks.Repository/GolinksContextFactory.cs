@@ -8,12 +8,18 @@ public sealed class GolinksContextFactory : IDesignTimeDbContextFactory<GolinksC
 {
     public GolinksContext CreateDbContext(string[] args)
     {
+        var basePath = args.Length > 0 && Directory.Exists(args[0])
+            ? args[0]
+            : Path.Combine(Directory.GetCurrentDirectory(), "../Golinks.WebAPI");
+
         var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
+            .SetBasePath(basePath)
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile("appsettings.Development.json", optional: true)
             .Build();
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
         var optionsBuilder = new DbContextOptionsBuilder<GolinksContext>();
         optionsBuilder.UseNpgsql(connectionString);

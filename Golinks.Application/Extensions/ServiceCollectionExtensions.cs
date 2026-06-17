@@ -8,13 +8,12 @@ namespace Golinks.Application.Extensions;
 [ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
-    public static void AddAutoMapperConfiguration(this IServiceCollection services)
+    public static void AddApplicationServices(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services, nameof(services));
 
         services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
         services.AddScoped<ILinkService, LinkService>();
-        services.AddScoped<IMetricService, MetricService>();
         services.AddScoped<IActionService, ActionService>();
 
         services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));

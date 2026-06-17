@@ -1,4 +1,5 @@
-﻿using Golinks.Repository.Contracts;
+﻿using Golinks.Domain;
+using Golinks.Repository.Contracts;
 using Golinks.Repository.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +9,7 @@ namespace Golinks.Repository.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    public static void RegisterRepositoryServices(this IServiceCollection services, IConfiguration configuration)
+    public static void AddRepositoryServices(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configuration);

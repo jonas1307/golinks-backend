@@ -17,6 +17,7 @@ public class LinkProfile : Profile
         CreateMap<LinkViewModel, Link>()
             .ForMember(x => x.Id, y => y.Ignore())
             .ForMember(x => x.CreatedAt, y => y.Ignore())
+            .ForMember(x => x.UpdatedAt, y => y.Ignore())
             .ForMember(x => x.TotalUsage, y => y.Ignore());
 
         CreateMap<MetricDTO, MetricViewModel>()

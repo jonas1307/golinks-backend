@@ -17,8 +17,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddAutoMapperConfiguration();
-builder.Services.RegisterRepositoryServices(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddRepositoryServices(builder.Configuration);
 
 builder.Services.AddControllers();
 

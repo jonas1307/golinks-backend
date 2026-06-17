@@ -3,6 +3,7 @@ using Golinks.Application.Contracts;
 using Golinks.Application.Requests;
 using Golinks.Application.ViewModel;
 using Golinks.Domain.Entities;
+using Golinks.Domain;
 using Golinks.Repository.Contracts;
 
 namespace Golinks.Application.Services;

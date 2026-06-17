@@ -1,5 +1,5 @@
-﻿using Golinks.Domain.Entities;
-using Golinks.Repository.Contracts;
+﻿using Golinks.Domain;
+using Golinks.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Reflection;
