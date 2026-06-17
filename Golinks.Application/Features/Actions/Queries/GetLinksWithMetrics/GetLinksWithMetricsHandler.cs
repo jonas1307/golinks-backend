@@ -11,7 +11,7 @@ public class GetLinksWithMetricsHandler(GolinksContext context, IMapper mapper) 
 {
     public async Task<RestResponse<IEnumerable<LinkMetricViewModel>>> Handle(GetLinksWithMetricsQuery request, CancellationToken cancellationToken)
     {
-        var query = context.Links.OrderByDescending(x => x.TotalUsage);
+        var query = context.Links.AsNoTracking().OrderByDescending(x => x.TotalUsage);
 
         var totalItems = await query.CountAsync(cancellationToken);
         var links = await query
@@ -35,14 +35,12 @@ public class GetLinksWithMetricsHandler(GolinksContext context, IMapper mapper) 
             })
             .ToListAsync(cancellationToken);
 
-        var result = mapper.Map<IEnumerable<LinkMetricViewModel>>(links);
+        var result = mapper.Map<IEnumerable<LinkMetricViewModel>>(links)
+            .ToDictionary(x => x.Id);
 
         foreach (var metric in metrics)
-        {
-            var viewModel = mapper.Map<MetricViewModel>(metric);
-            result.First(x => x.Id == metric.LinkId).Metrics.Add(viewModel);
-        }
+            result[metric.LinkId].Metrics.Add(mapper.Map<MetricViewModel>(metric));
 
-        return RestResponse<IEnumerable<LinkMetricViewModel>>.Success(result, request.BaseUrl, request.PageNumber, request.PageSize, totalItems);
+        return RestResponse<IEnumerable<LinkMetricViewModel>>.Success(result.Values, request.BaseUrl, request.PageNumber, request.PageSize, totalItems);
     }
 }

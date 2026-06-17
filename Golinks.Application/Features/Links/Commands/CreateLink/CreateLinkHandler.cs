@@ -11,9 +11,9 @@ public class CreateLinkHandler(GolinksContext context, IMapper mapper) : IReques
 {
     public async Task<RestResponse<LinkViewModel>> Handle(CreateLinkCommand request, CancellationToken cancellationToken)
     {
-        var existing = await context.Links.FirstOrDefaultAsync(x => x.Slug == request.Model.Slug, cancellationToken);
+        var slugExists = await context.Links.AnyAsync(x => x.Slug == request.Model.Slug, cancellationToken);
 
-        if (existing != null)
+        if (slugExists)
             return RestResponse<LinkViewModel>.Error($"Slug \"{request.Model.Slug}\" already exists.");
 
         var link = mapper.Map<Link>(request.Model);

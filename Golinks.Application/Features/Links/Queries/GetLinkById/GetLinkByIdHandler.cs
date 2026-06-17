@@ -2,6 +2,7 @@ using AutoMapper;
 using Golinks.Application.ViewModel;
 using Golinks.Repository;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Golinks.Application.Features.Links.Queries.GetLinkById;
 
@@ -9,7 +10,9 @@ public class GetLinkByIdHandler(GolinksContext context, IMapper mapper) : IReque
 {
     public async Task<RestResponse<LinkViewModel>> Handle(GetLinkByIdQuery request, CancellationToken cancellationToken)
     {
-        var link = await context.Links.FindAsync([request.Id], cancellationToken);
+        var link = await context.Links
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
         if (link == null)
             return RestResponse<LinkViewModel>.Error($"Link with ID {request.Id} was not found.");

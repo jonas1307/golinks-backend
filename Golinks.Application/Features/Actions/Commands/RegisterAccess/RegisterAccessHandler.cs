@@ -11,7 +11,9 @@ public class RegisterAccessHandler(GolinksContext context, IMapper mapper) : IRe
 {
     public async Task<RestResponse<LinkViewModel>> Handle(RegisterAccessCommand request, CancellationToken cancellationToken)
     {
-        var link = await context.Links.FirstOrDefaultAsync(x => x.Slug == request.Slug, cancellationToken);
+        var link = await context.Links
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Slug == request.Slug, cancellationToken);
 
         if (link == null)
             return RestResponse<LinkViewModel>.Error("No link was found with the given slug.");

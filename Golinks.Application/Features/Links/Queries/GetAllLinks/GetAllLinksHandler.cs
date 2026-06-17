@@ -10,7 +10,7 @@ public class GetAllLinksHandler(GolinksContext context, IMapper mapper) : IReque
 {
     public async Task<RestResponse<IEnumerable<LinkViewModel>>> Handle(GetAllLinksQuery request, CancellationToken cancellationToken)
     {
-        var query = context.Links.AsQueryable();
+        var query = context.Links.AsNoTracking();
 
         var totalItems = await query.CountAsync(cancellationToken);
         var data = await query
