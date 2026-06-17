@@ -15,16 +15,12 @@ public class ActionService(ILinkRepository linkRepository, IMetricRepository met
 
     public async Task<RestResponse<LinkViewModel>> RegisterAccess(string slug)
     {
-        var link = await _linkRepository.FindOneAsync(x => x.Slug == slug);
+        var link = await _linkRepository.IncrementUsageAsync(slug);
 
-        if (link == null) 
+        if (link == null)
         {
             return RestResponse<LinkViewModel>.Error("No link was found with the given slug.");
         }
-
-        link.RegisterUsage();
-
-        await _linkRepository.UpdateAsync(link);
 
         var metric = new Metric { LinkId = link.Id };
 
