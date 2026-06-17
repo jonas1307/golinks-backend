@@ -1,4 +1,5 @@
 using AutoMapper;
+using Golinks.Application.Common;
 using Golinks.Application.ViewModel;
 using Golinks.Domain.Entities;
 using Golinks.Repository;
@@ -7,16 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Golinks.Application.Features.Actions.Commands.RegisterAccess;
 
-public class RegisterAccessHandler(GolinksContext context, IMapper mapper) : IRequestHandler<RegisterAccessCommand, RestResponse<LinkViewModel>>
+public class RegisterAccessHandler(GolinksContext context, IMapper mapper) : IRequestHandler<RegisterAccessCommand, Result<LinkViewModel>>
 {
-    public async Task<RestResponse<LinkViewModel>> Handle(RegisterAccessCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LinkViewModel>> Handle(RegisterAccessCommand request, CancellationToken cancellationToken)
     {
         var link = await context.Links
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Slug == request.Slug, cancellationToken);
 
         if (link == null)
-            return RestResponse<LinkViewModel>.Error("No link was found with the given slug.");
+            return Error.NotFound("No link was found with the given slug.");
 
         await context.BeginTransactionAsync();
 
@@ -33,7 +34,7 @@ public class RegisterAccessHandler(GolinksContext context, IMapper mapper) : IRe
 
             link.TotalUsage += 1;
 
-            return RestResponse<LinkViewModel>.Success(mapper.Map<LinkViewModel>(link));
+            return mapper.Map<LinkViewModel>(link);
         }
         catch
         {

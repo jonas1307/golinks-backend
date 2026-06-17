@@ -19,63 +19,52 @@ namespace Golinks.WebAPI.Controllers;
 public class LinksController(IMediator mediator) : ControllerBase
 {
     [HttpGet(Name = "GetAllLinks")]
-    [ProducesResponseType(typeof(RestResponse<IEnumerable<LinkViewModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
         var baseUrl = Url.Action("Index", "Links", null, Request.Scheme);
         var result = await mediator.Send(new GetAllLinksQuery(@params.PageNumber, @params.PageSize, baseUrl));
-        return Ok(result);
+        return result.ToActionResult(this, Ok);
     }
 
     [HttpGet("{id:guid}", Name = "GetLinkById")]
-    [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await mediator.Send(new GetLinkByIdQuery(id));
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return result.ToActionResult(this, Ok);
     }
 
     [HttpPost(Name = "CreateLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
-    [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create([FromBody] LinkViewModel model)
     {
-        if (!ModelState.IsValid)
-        {
-            var errors = ModelState.Values
-                .SelectMany(v => v.Errors)
-                .Select(e => e.ErrorMessage);
-
-            return BadRequest(RestResponse<object>.Error(errors));
-        }
-
         var result = await mediator.Send(new CreateLinkCommand(model));
-
-        if (!result.IsSuccess)
-            return BadRequest(result);
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
+        return result.ToActionResult(this, data => CreatedAtAction(nameof(GetById), new { id = data.Id }, data));
     }
 
     [HttpPut("{id:guid}", Name = "UpdateLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
-    [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status202Accepted)]
-    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Update(Guid id, [FromBody] LinkViewModel model)
     {
         var result = await mediator.Send(new UpdateLinkCommand(id, model));
-        return result.IsSuccess ? AcceptedAtAction(nameof(GetById), new { id }, result) : BadRequest(result);
+        return result.ToActionResult(this, data => AcceptedAtAction(nameof(GetById), new { id = data.Id }, data));
     }
 
     [HttpDelete("{id:guid}", Name = "DeleteLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
-    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status202Accepted)]
-    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await mediator.Send(new DeleteLinkCommand(id));
-        return result.IsSuccess ? AcceptedAtAction(nameof(GetById), new { id }, result) : BadRequest(result);
+        return result.ToActionResult(this, NoContent);
     }
 }

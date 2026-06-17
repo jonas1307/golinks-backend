@@ -1,4 +1,5 @@
 using AutoMapper;
+using Golinks.Application.Common;
 using Golinks.Application.ViewModel;
 using Golinks.Domain.DTOs;
 using Golinks.Repository;
@@ -7,9 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Golinks.Application.Features.Actions.Queries.GetLinksWithMetrics;
 
-public class GetLinksWithMetricsHandler(GolinksContext context, IMapper mapper) : IRequestHandler<GetLinksWithMetricsQuery, RestResponse<IEnumerable<LinkMetricViewModel>>>
+public class GetLinksWithMetricsHandler(GolinksContext context, IMapper mapper) : IRequestHandler<GetLinksWithMetricsQuery, Result<PagedResult<LinkMetricViewModel>>>
 {
-    public async Task<RestResponse<IEnumerable<LinkMetricViewModel>>> Handle(GetLinksWithMetricsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResult<LinkMetricViewModel>>> Handle(GetLinksWithMetricsQuery request, CancellationToken cancellationToken)
     {
         var query = context.Links.AsNoTracking().OrderByDescending(x => x.TotalUsage);
 
@@ -41,6 +42,11 @@ public class GetLinksWithMetricsHandler(GolinksContext context, IMapper mapper) 
         foreach (var metric in metrics)
             result[metric.LinkId].Metrics.Add(mapper.Map<MetricViewModel>(metric));
 
-        return RestResponse<IEnumerable<LinkMetricViewModel>>.Success(result.Values, request.BaseUrl, request.PageNumber, request.PageSize, totalItems);
+        return PagedResult<LinkMetricViewModel>.Create(
+            result.Values,
+            request.PageNumber,
+            request.PageSize,
+            totalItems,
+            request.BaseUrl);
     }
 }
