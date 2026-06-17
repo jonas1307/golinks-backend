@@ -1,13 +1,13 @@
-using AutoMapper;
 using Golinks.Application.Common;
 using Golinks.Application.Responses;
 using Golinks.Repository;
+using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Golinks.Application.Features.Links.Commands.UpdateLink;
 
-public class UpdateLinkHandler(GolinksContext context, IMapper mapper) : IRequestHandler<UpdateLinkCommand, Result<LinkResponse>>
+public class UpdateLinkHandler(GolinksContext context) : IRequestHandler<UpdateLinkCommand, Result<LinkResponse>>
 {
     public async Task<Result<LinkResponse>> Handle(UpdateLinkCommand request, CancellationToken cancellationToken)
     {
@@ -21,10 +21,10 @@ public class UpdateLinkHandler(GolinksContext context, IMapper mapper) : IReques
         if (link == null)
             return Error.NotFound($"Link with ID {request.Id} was not found.");
 
-        mapper.Map(request.Model, link);
+        request.Model.Adapt(link);
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return mapper.Map<LinkResponse>(link);
+        return link.Adapt<LinkResponse>();
     }
 }

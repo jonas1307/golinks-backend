@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+using FluentValidation;
+using Golinks.Application.MappingProfiles;
+using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -12,8 +14,10 @@ public static class ServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services, nameof(services));
 
+        var config = TypeAdapterConfig.GlobalSettings;
+        LinkProfile.Register(config);
+
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-        services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

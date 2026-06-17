@@ -1,13 +1,13 @@
-using AutoMapper;
 using Golinks.Application.Common;
 using Golinks.Application.Responses;
 using Golinks.Repository;
+using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Golinks.Application.Features.Links.Queries.GetAllLinks;
 
-public class GetAllLinksHandler(GolinksContext context, IMapper mapper) : IRequestHandler<GetAllLinksQuery, Result<PagedResult<LinkResponse>>>
+public class GetAllLinksHandler(GolinksContext context) : IRequestHandler<GetAllLinksQuery, Result<PagedResult<LinkResponse>>>
 {
     public async Task<Result<PagedResult<LinkResponse>>> Handle(GetAllLinksQuery request, CancellationToken cancellationToken)
     {
@@ -20,7 +20,7 @@ public class GetAllLinksHandler(GolinksContext context, IMapper mapper) : IReque
             .ToListAsync(cancellationToken);
 
         return PagedResult<LinkResponse>.Create(
-            mapper.Map<IEnumerable<LinkResponse>>(data),
+            data.Adapt<IEnumerable<LinkResponse>>(),
             request.PageNumber,
             request.PageSize,
             totalItems,

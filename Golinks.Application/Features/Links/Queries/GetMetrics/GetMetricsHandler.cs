@@ -1,14 +1,14 @@
-using AutoMapper;
 using Golinks.Application.Common;
 using Golinks.Application.Responses;
 using Golinks.Domain.DTOs;
 using Golinks.Repository;
+using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Golinks.Application.Features.Links.Queries.GetMetrics;
 
-public class GetMetricsHandler(GolinksContext context, IMapper mapper) : IRequestHandler<GetMetricsQuery, Result<PagedResult<LinkMetricResponse>>>
+public class GetMetricsHandler(GolinksContext context) : IRequestHandler<GetMetricsQuery, Result<PagedResult<LinkMetricResponse>>>
 {
     public async Task<Result<PagedResult<LinkMetricResponse>>> Handle(GetMetricsQuery request, CancellationToken cancellationToken)
     {
@@ -36,11 +36,11 @@ public class GetMetricsHandler(GolinksContext context, IMapper mapper) : IReques
             })
             .ToListAsync(cancellationToken);
 
-        var result = mapper.Map<IEnumerable<LinkMetricResponse>>(links)
+        var result = links.Adapt<IEnumerable<LinkMetricResponse>>()
             .ToDictionary(x => x.Id);
 
         foreach (var metric in metrics)
-            result[metric.LinkId].Metrics.Add(mapper.Map<MetricResponse>(metric));
+            result[metric.LinkId].Metrics.Add(metric.Adapt<MetricResponse>());
 
         return PagedResult<LinkMetricResponse>.Create(
             result.Values,
