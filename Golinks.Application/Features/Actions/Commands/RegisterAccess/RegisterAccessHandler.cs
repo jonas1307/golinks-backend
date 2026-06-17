@@ -1,38 +1,41 @@
 using AutoMapper;
 using Golinks.Application.ViewModel;
-using Golinks.Domain;
 using Golinks.Domain.Entities;
-using Golinks.Repository.Contracts;
+using Golinks.Repository;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Golinks.Application.Features.Actions.Commands.RegisterAccess;
 
-public class RegisterAccessHandler(ILinkRepository linkRepository, IMetricRepository metricRepository, IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<RegisterAccessCommand, RestResponse<LinkViewModel>>
+public class RegisterAccessHandler(GolinksContext context, IMapper mapper) : IRequestHandler<RegisterAccessCommand, RestResponse<LinkViewModel>>
 {
     public async Task<RestResponse<LinkViewModel>> Handle(RegisterAccessCommand request, CancellationToken cancellationToken)
     {
-        var link = await linkRepository.FindOneAsync(x => x.Slug == request.Slug);
+        var link = await context.Links.FirstOrDefaultAsync(x => x.Slug == request.Slug, cancellationToken);
 
         if (link == null)
             return RestResponse<LinkViewModel>.Error("No link was found with the given slug.");
 
-        await unitOfWork.BeginTransactionAsync();
+        await context.BeginTransactionAsync();
 
         try
         {
+            await context.Links
+                .Where(x => x.Slug == request.Slug)
+                .ExecuteUpdateAsync(s => s.SetProperty(l => l.TotalUsage, l => l.TotalUsage + 1), cancellationToken);
+
+            context.Metrics.Add(new Metric { LinkId = link.Id });
+            await context.SaveChangesAsync(cancellationToken);
+
+            await context.CommitAsync();
+
             link.TotalUsage += 1;
-
-            await linkRepository.IncrementUsageAsync(request.Slug);
-
-            await metricRepository.CreateAsync(new Metric { LinkId = link.Id });
-
-            await unitOfWork.CommitAsync();
 
             return RestResponse<LinkViewModel>.Success(mapper.Map<LinkViewModel>(link));
         }
         catch
         {
-            await unitOfWork.RollbackAsync();
+            await context.RollbackAsync();
             throw;
         }
     }

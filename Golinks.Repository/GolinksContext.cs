@@ -1,12 +1,11 @@
-﻿using Golinks.Domain;
-using Golinks.Domain.Entities;
+﻿using Golinks.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Reflection;
 
 namespace Golinks.Repository;
 
-public class GolinksContext(DbContextOptions<GolinksContext> options) : DbContext(options), IUnitOfWork
+public class GolinksContext(DbContextOptions<GolinksContext> options) : DbContext(options)
 {
     public DbSet<Link> Links { get; set; }
     public DbSet<Metric> Metrics { get; set; }

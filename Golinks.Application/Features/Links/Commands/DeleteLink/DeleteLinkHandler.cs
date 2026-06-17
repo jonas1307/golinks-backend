@@ -1,19 +1,20 @@
 using Golinks.Application.ViewModel;
-using Golinks.Repository.Contracts;
+using Golinks.Repository;
 using MediatR;
 
 namespace Golinks.Application.Features.Links.Commands.DeleteLink;
 
-public class DeleteLinkHandler(ILinkRepository linkRepository) : IRequestHandler<DeleteLinkCommand, RestResponse<object>>
+public class DeleteLinkHandler(GolinksContext context) : IRequestHandler<DeleteLinkCommand, RestResponse<object>>
 {
     public async Task<RestResponse<object>> Handle(DeleteLinkCommand request, CancellationToken cancellationToken)
     {
-        var link = await linkRepository.FindByIdAsync(request.Id);
+        var link = await context.Links.FindAsync([request.Id], cancellationToken);
 
         if (link == null)
             return RestResponse<object>.Error($"Link with ID {request.Id} was not found.");
 
-        await linkRepository.DeleteAsync(link);
+        context.Links.Remove(link);
+        await context.SaveChangesAsync(cancellationToken);
 
         return RestResponse<object>.Success(new { });
     }

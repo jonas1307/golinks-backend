@@ -1,6 +1,3 @@
-﻿using Golinks.Domain;
-using Golinks.Repository.Contracts;
-using Golinks.Repository.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,13 +11,7 @@ public static class ServiceCollectionExtension
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configuration);
 
-        services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-        services.AddScoped<ILinkRepository, LinkRepository>();
-        services.AddScoped<IMetricRepository, MetricRepository>();
-
         services.AddDbContext<GolinksContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<GolinksContext>());
     }
 }
