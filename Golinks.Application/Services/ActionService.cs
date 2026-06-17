@@ -7,26 +7,40 @@ using Golinks.Repository.Contracts;
 
 namespace Golinks.Application.Services;
 
-public class ActionService(ILinkRepository linkRepository, IMetricRepository metricRepository, IMapper mapper) : IActionService
+public class ActionService(ILinkRepository linkRepository, IMetricRepository metricRepository, IUnitOfWork unitOfWork, IMapper mapper) : IActionService
 {
     private readonly ILinkRepository _linkRepository = linkRepository;
     private readonly IMetricRepository _metricRepository = metricRepository;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IMapper _mapper = mapper;
 
     public async Task<RestResponse<LinkViewModel>> RegisterAccess(string slug)
     {
-        var link = await _linkRepository.IncrementUsageAsync(slug);
+        await _unitOfWork.BeginTransactionAsync();
 
-        if (link == null)
+        try
         {
-            return RestResponse<LinkViewModel>.Error("No link was found with the given slug.");
+            var link = await _linkRepository.IncrementUsageAsync(slug);
+
+            if (link == null)
+            {
+                await _unitOfWork.RollbackAsync();
+                return RestResponse<LinkViewModel>.Error("No link was found with the given slug.");
+            }
+
+            var metric = new Metric { LinkId = link.Id };
+
+            await _metricRepository.CreateAsync(metric);
+
+            await _unitOfWork.CommitAsync();
+
+            return RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
         }
-
-        var metric = new Metric { LinkId = link.Id };
-
-        await _metricRepository.CreateAsync(metric);
-
-        return RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
+        catch
+        {
+            await _unitOfWork.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<RestResponse<IEnumerable<LinkMetricViewModel>>> GetLinksWithMetrics(LinkMetricParams @params, string baseUrl)
