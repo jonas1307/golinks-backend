@@ -1,6 +1,6 @@
-﻿namespace Golinks.Application.ViewModel;
+namespace Golinks.Application.Responses;
 
-public class MetricViewModel
+public class MetricResponse
 {
     public string Date { get; set; }
     public int TotalClicks { get; set; }

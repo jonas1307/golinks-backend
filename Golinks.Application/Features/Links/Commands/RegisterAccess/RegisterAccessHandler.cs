@@ -1,6 +1,6 @@
 using AutoMapper;
 using Golinks.Application.Common;
-using Golinks.Application.ViewModel;
+using Golinks.Application.Responses;
 using Golinks.Domain.Entities;
 using Golinks.Repository;
 using MediatR;
@@ -8,9 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Golinks.Application.Features.Links.Commands.RegisterAccess;
 
-public class RegisterAccessHandler(GolinksContext context, IMapper mapper) : IRequestHandler<RegisterAccessCommand, Result<LinkViewModel>>
+public class RegisterAccessHandler(GolinksContext context, IMapper mapper) : IRequestHandler<RegisterAccessCommand, Result<LinkResponse>>
 {
-    public async Task<Result<LinkViewModel>> Handle(RegisterAccessCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LinkResponse>> Handle(RegisterAccessCommand request, CancellationToken cancellationToken)
     {
         var link = await context.Links
             .AsNoTracking()
@@ -34,7 +34,7 @@ public class RegisterAccessHandler(GolinksContext context, IMapper mapper) : IRe
 
             link.TotalUsage += 1;
 
-            return mapper.Map<LinkViewModel>(link);
+            return mapper.Map<LinkResponse>(link);
         }
         catch
         {

@@ -6,7 +6,7 @@ using Golinks.Application.Features.Links.Queries.GetAllLinks;
 using Golinks.Application.Features.Links.Queries.GetLinkById;
 using Golinks.Application.Features.Links.Queries.GetMetrics;
 using Golinks.Application.Requests;
-using Golinks.Application.ViewModel;
+using Golinks.Application.Responses;
 using Golinks.WebAPI.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +30,7 @@ public class LinksController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id:guid}", Name = "GetLinkById")]
-    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -40,10 +40,10 @@ public class LinksController(IMediator mediator) : ControllerBase
 
     [HttpPost(Name = "CreateLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
-    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Create([FromBody] LinkViewModel model)
+    public async Task<IActionResult> Create([FromBody] LinkRequest model)
     {
         var result = await mediator.Send(new CreateLinkCommand(model));
         return result.ToActionResult(this, data => CreatedAtAction(nameof(GetById), new { id = data.Id }, data));
@@ -51,10 +51,10 @@ public class LinksController(IMediator mediator) : ControllerBase
 
     [HttpPut("{id:guid}", Name = "UpdateLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
-    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status202Accepted)]
+    [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Update(Guid id, [FromBody] LinkViewModel model)
+    public async Task<IActionResult> Update(Guid id, [FromBody] LinkRequest model)
     {
         var result = await mediator.Send(new UpdateLinkCommand(id, model));
         return result.ToActionResult(this, data => AcceptedAtAction(nameof(GetById), new { id = data.Id }, data));
@@ -72,7 +72,7 @@ public class LinksController(IMediator mediator) : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("register-access/{slug}", Name = "RegisterAccess")]
-    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RegisterAccess(string slug)
     {

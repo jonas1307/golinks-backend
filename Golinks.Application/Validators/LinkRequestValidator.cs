@@ -1,11 +1,11 @@
 using FluentValidation;
-using Golinks.Application.ViewModel;
+using Golinks.Application.Requests;
 
 namespace Golinks.Application.Validators;
 
-public class LinkViewModelValidator : AbstractValidator<LinkViewModel>
+public class LinkRequestValidator : AbstractValidator<LinkRequest>
 {
-    public LinkViewModelValidator()
+    public LinkRequestValidator()
     {
         RuleFor(x => x.Url)
             .NotEmpty()

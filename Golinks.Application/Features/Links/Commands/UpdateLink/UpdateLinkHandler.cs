@@ -1,15 +1,15 @@
 using AutoMapper;
 using Golinks.Application.Common;
-using Golinks.Application.ViewModel;
+using Golinks.Application.Responses;
 using Golinks.Repository;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Golinks.Application.Features.Links.Commands.UpdateLink;
 
-public class UpdateLinkHandler(GolinksContext context, IMapper mapper) : IRequestHandler<UpdateLinkCommand, Result<LinkViewModel>>
+public class UpdateLinkHandler(GolinksContext context, IMapper mapper) : IRequestHandler<UpdateLinkCommand, Result<LinkResponse>>
 {
-    public async Task<Result<LinkViewModel>> Handle(UpdateLinkCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LinkResponse>> Handle(UpdateLinkCommand request, CancellationToken cancellationToken)
     {
         var slugTaken = await context.Links.AnyAsync(x => x.Slug == request.Model.Slug && x.Id != request.Id, cancellationToken);
 
@@ -25,6 +25,6 @@ public class UpdateLinkHandler(GolinksContext context, IMapper mapper) : IReques
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return mapper.Map<LinkViewModel>(link);
+        return mapper.Map<LinkResponse>(link);
     }
 }
