@@ -1,4 +1,5 @@
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Golinks.Application.Extensions;
 using Golinks.Repository.Extensions;
 using Golinks.WebAPI.Extensions;
@@ -22,7 +23,8 @@ builder.Services.AddApplicationServices();
 builder.Services.AddRepositoryServices(builder.Configuration);
 
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+    options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseParameterTransformer())));
 
 builder.Services.AddAuthentication(options =>
 {

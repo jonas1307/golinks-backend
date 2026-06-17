@@ -16,7 +16,7 @@ namespace Golinks.WebAPI.Controllers;
 public class ActionsController(IMediator mediator) : ControllerBase
 {
     [AllowAnonymous]
-    [HttpGet("RegisterAccess/{slug}", Name = "RegisterAccess")]
+    [HttpGet("register-access/{slug}", Name = "RegisterAccess")]
     [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RegisterAccess(string slug)
@@ -26,7 +26,7 @@ public class ActionsController(IMediator mediator) : ControllerBase
     }
 
     [AllowAnonymous]
-    [HttpGet("GetLinksWithMetrics", Name = "GetLinksWithMetrics")]
+    [HttpGet("get-links-with-metrics", Name = "GetLinksWithMetrics")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLinksWithMetrics([FromQuery] LinkMetricParams @params)
     {
