@@ -1,4 +1,5 @@
-﻿using Golinks.Application.Contracts;
+﻿using FluentValidation;
+using Golinks.Application.Contracts;
 using Golinks.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -19,5 +20,6 @@ public static class ServiceCollectionExtensions
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
         services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

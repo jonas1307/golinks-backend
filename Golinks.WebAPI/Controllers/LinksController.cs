@@ -43,7 +43,13 @@ public class LinksController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Create([FromBody] LinkViewModel model)
     {
         if (!ModelState.IsValid)
-            return BadRequest(RestResponse<object>.Error("The request is invalid."));
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage);
+
+            return BadRequest(RestResponse<object>.Error(errors));
+        }
 
         var result = await mediator.Send(new CreateLinkCommand(model));
 

@@ -1,3 +1,4 @@
+using FluentValidation.AspNetCore;
 using Golinks.Application.Extensions;
 using Golinks.Repository.Extensions;
 using Golinks.WebAPI.Extensions;
@@ -20,6 +21,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplicationServices();
 builder.Services.AddRepositoryServices(builder.Configuration);
 
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddControllers();
 
 builder.Services.AddAuthentication(options =>
