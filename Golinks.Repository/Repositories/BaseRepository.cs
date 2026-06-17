@@ -53,7 +53,6 @@ public class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocum
 
     public async Task UpdateAsync(TDocument entity)
     {
-        _dbSet.Attach(entity);
         _context.Entry(entity).State = EntityState.Modified;
         await _context.SaveChangesAsync();
     }

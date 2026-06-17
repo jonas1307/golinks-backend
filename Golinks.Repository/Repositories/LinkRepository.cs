@@ -16,12 +16,10 @@ public class LinkRepository(GolinksContext context) : BaseRepository<Link>(conte
         return (links, totalItems);
     }
 
-    public async Task<Link> IncrementUsageAsync(string slug)
+    public async Task IncrementUsageAsync(string slug)
     {
         await _context.Links
             .Where(x => x.Slug == slug)
             .ExecuteUpdateAsync(s => s.SetProperty(l => l.TotalUsage, l => l.TotalUsage + 1));
-
-        return await _context.Links.FirstOrDefaultAsync(x => x.Slug == slug);
     }
 }
