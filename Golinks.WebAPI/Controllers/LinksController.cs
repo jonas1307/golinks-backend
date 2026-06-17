@@ -1,8 +1,10 @@
 using Golinks.Application.Features.Links.Commands.CreateLink;
 using Golinks.Application.Features.Links.Commands.DeleteLink;
+using Golinks.Application.Features.Links.Commands.RegisterAccess;
 using Golinks.Application.Features.Links.Commands.UpdateLink;
 using Golinks.Application.Features.Links.Queries.GetAllLinks;
 using Golinks.Application.Features.Links.Queries.GetLinkById;
+using Golinks.Application.Features.Links.Queries.GetMetrics;
 using Golinks.Application.Requests;
 using Golinks.Application.ViewModel;
 using Golinks.WebAPI.Extensions;
@@ -22,7 +24,7 @@ public class LinksController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
-        var baseUrl = Url.Action("Index", "Links", null, Request.Scheme);
+        var baseUrl = Url.Action(nameof(Index), "Links", null, Request.Scheme);
         var result = await mediator.Send(new GetAllLinksQuery(@params.PageNumber, @params.PageSize, baseUrl));
         return result.ToActionResult(this, Ok);
     }
@@ -66,5 +68,25 @@ public class LinksController(IMediator mediator) : ControllerBase
     {
         var result = await mediator.Send(new DeleteLinkCommand(id));
         return result.ToActionResult(this, NoContent);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("register-access/{slug}", Name = "RegisterAccess")]
+    [ProducesResponseType(typeof(LinkViewModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RegisterAccess(string slug)
+    {
+        var result = await mediator.Send(new RegisterAccessCommand(slug));
+        return result.ToActionResult(this, Ok);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("metrics", Name = "GetLinksWithMetrics")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMetrics([FromQuery] LinkMetricParams @params)
+    {
+        var baseUrl = Url.Action(nameof(GetMetrics), "Links", null, Request.Scheme);
+        var result = await mediator.Send(new GetMetricsQuery(@params.PageNumber, @params.PageSize, @params.MetricRange, baseUrl));
+        return result.ToActionResult(this, Ok);
     }
 }

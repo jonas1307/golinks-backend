@@ -6,11 +6,11 @@ using Golinks.Repository;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Golinks.Application.Features.Actions.Queries.GetLinksWithMetrics;
+namespace Golinks.Application.Features.Links.Queries.GetMetrics;
 
-public class GetLinksWithMetricsHandler(GolinksContext context, IMapper mapper) : IRequestHandler<GetLinksWithMetricsQuery, Result<PagedResult<LinkMetricViewModel>>>
+public class GetMetricsHandler(GolinksContext context, IMapper mapper) : IRequestHandler<GetMetricsQuery, Result<PagedResult<LinkMetricViewModel>>>
 {
-    public async Task<Result<PagedResult<LinkMetricViewModel>>> Handle(GetLinksWithMetricsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResult<LinkMetricViewModel>>> Handle(GetMetricsQuery request, CancellationToken cancellationToken)
     {
         var query = context.Links.AsNoTracking().OrderByDescending(x => x.TotalUsage);
 

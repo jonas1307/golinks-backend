@@ -6,7 +6,7 @@ using Golinks.Repository;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Golinks.Application.Features.Actions.Commands.RegisterAccess;
+namespace Golinks.Application.Features.Links.Commands.RegisterAccess;
 
 public class RegisterAccessHandler(GolinksContext context, IMapper mapper) : IRequestHandler<RegisterAccessCommand, Result<LinkViewModel>>
 {
