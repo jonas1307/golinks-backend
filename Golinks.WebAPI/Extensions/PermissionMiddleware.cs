@@ -7,7 +7,7 @@ public class PermissionMiddleware(RequestDelegate next)
     public async Task InvokeAsync(HttpContext context)
     {
         var endpoint = context.GetEndpoint();
-        var requiredPermission = endpoint?.Metadata.GetMetadata<PermissionRequirementAttribute>()?.Policy;
+        var requiredPermission = endpoint?.Metadata.GetMetadata<PermissionRequirementAttribute>()?.RequiredPermission;
 
         if (requiredPermission != null)
         {

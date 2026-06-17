@@ -4,8 +4,10 @@ namespace Golinks.WebAPI.Extensions;
 
 public class PermissionRequirementAttribute : AuthorizeAttribute
 {
+    public string RequiredPermission { get; }
+
     public PermissionRequirementAttribute(string permission) : base("PermissionPolicy")
     {
-        Policy = permission;
+        RequiredPermission = permission;
     }
 }

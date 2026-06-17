@@ -33,16 +33,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("PermissionPolicy", policy =>
-        policy.RequireAssertion(context =>
-        {
-            var userPermissions = context.User.FindFirst("permissions")?.Value;
-            if (string.IsNullOrEmpty(userPermissions))
-                return false;
-
-            var requiredPermission = context.Resource as string;
-            return userPermissions.Split(',').Contains(requiredPermission);
-        }));
+    .AddPolicy("PermissionPolicy", policy => policy.RequireAuthenticatedUser());
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSwaggerConfiguration();
@@ -63,6 +54,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<PermissionMiddleware>();
 
 app.MapControllers();
 

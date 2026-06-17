@@ -3,7 +3,7 @@ namespace Golinks.Application.ViewModel;
 public class RestResponse<T> where T : class
 {
     public bool IsSuccess { get; set; }
-    public string ErrorMessage { get; set; }
+    public IEnumerable<string> Errors { get; set; }
     public T Data { get; set; }
     public PaginationResponse Pagination { get; set; }
 
@@ -21,6 +21,11 @@ public class RestResponse<T> where T : class
 
     public static RestResponse<T> Error(string errorMessage)
     {
-        return new RestResponse<T> { IsSuccess = false, ErrorMessage = errorMessage };
+        return new RestResponse<T> { IsSuccess = false, Errors = [errorMessage] };
+    }
+
+    public static RestResponse<T> Error(IEnumerable<string> errors)
+    {
+        return new RestResponse<T> { IsSuccess = false, Errors = errors };
     }
 }

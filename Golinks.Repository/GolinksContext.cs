@@ -56,14 +56,16 @@ public class GolinksContext(DbContextOptions<GolinksContext> options) : DbContex
     private void UpdateTimestamps()
     {
         var entries = ChangeTracker.Entries()
-            .Where(e => e.Entity is BaseEntity && e.State == EntityState.Added);
+            .Where(e => e.Entity is BaseEntity && (e.State == EntityState.Added || e.State == EntityState.Modified));
 
         foreach (var entry in entries)
         {
+            var entity = (BaseEntity)entry.Entity;
+
             if (entry.State == EntityState.Added)
-            {
-                ((BaseEntity)entry.Entity).CreatedAt = DateTime.UtcNow;
-            }
+                entity.CreatedAt = DateTime.UtcNow;
+            else
+                entity.UpdatedAt = DateTime.UtcNow;
         }
     }
 }
