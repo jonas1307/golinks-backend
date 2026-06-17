@@ -1,11 +1,12 @@
 ﻿using Golinks.Domain.Entities;
-using Golinks.Repository.Configurations;
+using Golinks.Repository.Contracts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Reflection;
 
 namespace Golinks.Repository;
 
-public class GolinksContext(DbContextOptions<GolinksContext> options) : DbContext(options)
+public class GolinksContext(DbContextOptions<GolinksContext> options) : DbContext(options), IUnitOfWork
 {
     public DbSet<Link> Links { get; set; }
     public DbSet<Metric> Metrics { get; set; }
@@ -31,17 +32,40 @@ public class GolinksContext(DbContextOptions<GolinksContext> options) : DbContex
         return base.SaveChangesAsync(cancellationToken);
     }
 
+    private IDbContextTransaction _currentTransaction;
+
+    public async Task BeginTransactionAsync()
+    {
+        _currentTransaction = await Database.BeginTransactionAsync();
+    }
+
+    public async Task CommitAsync()
+    {
+        await _currentTransaction.CommitAsync();
+        await _currentTransaction.DisposeAsync();
+        _currentTransaction = null;
+    }
+
+    public async Task RollbackAsync()
+    {
+        await _currentTransaction.RollbackAsync();
+        await _currentTransaction.DisposeAsync();
+        _currentTransaction = null;
+    }
+
     private void UpdateTimestamps()
     {
         var entries = ChangeTracker.Entries()
-            .Where(e => e.Entity is BaseEntity && e.State == EntityState.Added);
+            .Where(e => e.Entity is BaseEntity && (e.State == EntityState.Added || e.State == EntityState.Modified));
 
         foreach (var entry in entries)
         {
+            var entity = (BaseEntity)entry.Entity;
+
             if (entry.State == EntityState.Added)
-            {
-                ((BaseEntity)entry.Entity).CreatedAt = DateTime.UtcNow;
-            }
+                entity.CreatedAt = DateTime.UtcNow;
+            else
+                entity.UpdatedAt = DateTime.UtcNow;
         }
     }
 }

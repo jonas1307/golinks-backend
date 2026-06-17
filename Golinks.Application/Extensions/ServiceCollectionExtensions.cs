@@ -17,6 +17,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMetricService, MetricService>();
         services.AddTransient<IActionService, ActionService>();
 
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
     }
 }

@@ -18,11 +18,6 @@ public class BaseService<TEntity>(IBaseRepository<TEntity> repository) : IBaseSe
         await _repository.DeleteAsync(entity);
     }
 
-    public async Task<IList<TEntity>> FindAllAsync()
-    {
-        return await _repository.FindAllAsync();
-    }
-
     public async Task<(IList<TEntity>, int)> FindAllAsync(int pageNumber, int pageSize)
     {
         return await _repository.FindAllAsync(pageNumber, pageSize);

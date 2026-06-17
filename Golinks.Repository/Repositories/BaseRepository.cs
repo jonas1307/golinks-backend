@@ -22,10 +22,10 @@ public class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocum
 
     public async Task<(IList<TDocument>, int)> FindAllAsync(int pageNumber, int pageSize)
     {
-        var data = await _dbSet.Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize).ToListAsync();
+        var query = _dbSet.AsQueryable();
 
-        var count = await _dbSet.CountAsync();
+        var count = await query.CountAsync();
+        var data = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
         return (data, count);
     }

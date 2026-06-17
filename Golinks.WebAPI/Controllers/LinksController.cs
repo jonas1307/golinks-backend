@@ -81,14 +81,14 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(Guid id, [FromBody] LinkViewModel model)
     {
-        var linkInDb = await _linkSerice.FindOneAsync(x => x.Slug == model.Slug);
+        var linkWithSameSlug = await _linkSerice.FindOneAsync(x => x.Slug == model.Slug);
 
-        if (linkInDb?.Id != id)
+        if (linkWithSameSlug != null && linkWithSameSlug.Id != id)
         {
             return BadRequest(RestResponse<object>.Error("Slug already in use."));
         }
 
-        linkInDb = await _linkSerice.FindByIdAsync(id);
+        var linkInDb = await _linkSerice.FindByIdAsync(id);
 
         if (linkInDb == null)
         {
