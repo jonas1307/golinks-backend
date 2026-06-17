@@ -1,9 +1,12 @@
-﻿using AutoMapper;
-using Golinks.Application.Contracts;
+using Golinks.Application.Features.Links.Commands.CreateLink;
+using Golinks.Application.Features.Links.Commands.DeleteLink;
+using Golinks.Application.Features.Links.Commands.UpdateLink;
+using Golinks.Application.Features.Links.Queries.GetAllLinks;
+using Golinks.Application.Features.Links.Queries.GetLinkById;
 using Golinks.Application.Requests;
 using Golinks.Application.ViewModel;
-using Golinks.Domain.Entities;
 using Golinks.WebAPI.Extensions;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,21 +16,14 @@ namespace Golinks.WebAPI.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class LinksController(ILinkService linkService, IMapper mapper) : ControllerBase
+public class LinksController(IMediator mediator) : ControllerBase
 {
-    private readonly ILinkService _linkService = linkService;
-    private readonly IMapper _mapper = mapper;
-
     [HttpGet(Name = "GetAllLinks")]
     [ProducesResponseType(typeof(RestResponse<IEnumerable<LinkViewModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
-        var (data, totalItems) = await _linkService.FindAllAsync(@params.PageNumber, @params.PageSize);
-
-        var url = Url.Action("Index", "Links", null, Request.Scheme);
-
-        var result = RestResponse<IEnumerable<LinkViewModel>>.Success(_mapper.Map<IEnumerable<LinkViewModel>>(data), url, @params.PageNumber, @params.PageSize, totalItems);
-
+        var baseUrl = Url.Action("Index", "Links", null, Request.Scheme);
+        var result = await mediator.Send(new GetAllLinksQuery(@params.PageNumber, @params.PageSize, baseUrl));
         return Ok(result);
     }
 
@@ -36,16 +32,8 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var data = await _linkService.FindByIdAsync(id);
-
-        if (data == null)
-        {
-            return BadRequest(RestResponse<object>.Error($"Link with ID {id} was not found."));
-        }
-
-        var result = RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(data));
-
-        return Ok(result);
+        var result = await mediator.Send(new GetLinkByIdQuery(id));
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost(Name = "CreateLink")]
@@ -55,24 +43,14 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     public async Task<IActionResult> Create([FromBody] LinkViewModel model)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest(RestResponse<object>.Error("The request is invalid."));
-        }
 
-        var linkInDb = await _linkService.FindOneAsync(f => f.Slug == model.Slug);
+        var result = await mediator.Send(new CreateLinkCommand(model));
 
-        if (linkInDb != null)
-        {
-            return BadRequest(RestResponse<object>.Error($"Slug \"{model.Slug}\" already exists."));
-        }
+        if (!result.IsSuccess)
+            return BadRequest(result);
 
-        var link = _mapper.Map<Link>(model);
-
-        await _linkService.CreateAsync(link);
-
-        var result = RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
-
-        return CreatedAtAction(nameof(GetById), new { id = link.Id }, result);
+        return CreatedAtAction(nameof(GetById), new { id = result.Data.Id }, result);
     }
 
     [HttpPut("{id:guid}", Name = "UpdateLink")]
@@ -81,27 +59,8 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(Guid id, [FromBody] LinkViewModel model)
     {
-        var linkWithSameSlug = await _linkService.FindOneAsync(x => x.Slug == model.Slug);
-
-        if (linkWithSameSlug != null && linkWithSameSlug.Id != id)
-        {
-            return BadRequest(RestResponse<object>.Error("Slug already in use."));
-        }
-
-        var linkInDb = await _linkService.FindByIdAsync(id);
-
-        if (linkInDb == null)
-        {
-            return BadRequest(RestResponse<object>.Error($"Link with ID {id} was not found."));
-        }
-
-        var link = _mapper.Map(model, linkInDb);
-
-        await _linkService.UpdateAsync(link);
-
-        var result = RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
-
-        return AcceptedAtAction(nameof(GetById), new { id = link.Id }, result);
+        var result = await mediator.Send(new UpdateLinkCommand(id, model));
+        return result.IsSuccess ? AcceptedAtAction(nameof(GetById), new { id }, result) : BadRequest(result);
     }
 
     [HttpDelete("{id:guid}", Name = "DeleteLink")]
@@ -110,17 +69,7 @@ public class LinksController(ILinkService linkService, IMapper mapper) : Control
     [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var linkInDb = await _linkService.FindByIdAsync(id);
-
-        if (linkInDb == null)
-        {
-            return BadRequest(RestResponse<object>.Error($"Link with ID {id} was not found."));
-        }
-
-        await _linkService.DeleteAsync(linkInDb);
-
-        var result = RestResponse<object>.Success(new { });
-
-        return AcceptedAtAction(nameof(GetById), new { id = linkInDb.Id }, result);
+        var result = await mediator.Send(new DeleteLinkCommand(id));
+        return result.IsSuccess ? AcceptedAtAction(nameof(GetById), new { id }, result) : BadRequest(result);
     }
 }

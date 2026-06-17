@@ -1,6 +1,6 @@
 using Golinks.Application.Extensions;
-using Golinks.WebAPI.Extensions;
 using Golinks.Repository.Extensions;
+using Golinks.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,14 +35,12 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("PermissionPolicy", policy => policy.RequireAuthenticatedUser());
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSwaggerConfiguration();
 
 var app = builder.Build();
 
 app.UseContextMigrations();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerSetup();

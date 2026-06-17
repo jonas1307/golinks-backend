@@ -1,6 +1,8 @@
-﻿using Golinks.Application.Contracts;
+using Golinks.Application.Features.Actions.Commands.RegisterAccess;
+using Golinks.Application.Features.Actions.Queries.GetLinksWithMetrics;
 using Golinks.Application.Requests;
 using Golinks.Application.ViewModel;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,23 +12,16 @@ namespace Golinks.WebAPI.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class ActionsController(IActionService actionService) : ControllerBase
+public class ActionsController(IMediator mediator) : ControllerBase
 {
-    private readonly IActionService _actionService = actionService;
-
     [AllowAnonymous]
     [HttpGet("RegisterAccess/{slug}", Name = "RegisterAccess")]
     [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RegisterAccess(string slug)
     {
-        var response = await _actionService.RegisterAccess(slug);
-
-        if (response.IsSuccess)
-        {
-            return Ok(response);
-        }
-
-        return BadRequest(response);
+        var result = await mediator.Send(new RegisterAccessCommand(slug));
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [AllowAnonymous]
@@ -34,10 +29,8 @@ public class ActionsController(IActionService actionService) : ControllerBase
     [ProducesResponseType(typeof(RestResponse<IEnumerable<LinkMetricViewModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLinksWithMetrics([FromQuery] LinkMetricParams @params)
     {
-        var url = Url.Action("GetLinksWithMetrics", "Actions", null, Request.Scheme);
-        
-        var links = await _actionService.GetLinksWithMetrics(@params, url);
-
-        return Ok(links);
+        var baseUrl = Url.Action("GetLinksWithMetrics", "Actions", null, Request.Scheme);
+        var result = await mediator.Send(new GetLinksWithMetricsQuery(@params.PageNumber, @params.PageSize, @params.MetricRange, baseUrl));
+        return Ok(result);
     }
 }
