@@ -20,9 +20,9 @@ public class PermissionMiddleware(RequestDelegate next)
                 return;
             }
 
-            var userPermissions = context.User.FindFirst("permissions")?.Value;
+            var userPermissions = context.User.FindAll("permissions").Select(c => c.Value).ToHashSet();
 
-            if (string.IsNullOrEmpty(userPermissions) || !userPermissions.Split(',').Contains(requiredPermission))
+            if (!userPermissions.Contains(requiredPermission))
             {
                 await WriteProblemAsync(context, StatusCodes.Status403Forbidden, "Forbidden", "You don't have the required permission to access this resource.");
                 return;
