@@ -1,9 +1,14 @@
-﻿using AutoMapper;
-using Golinks.Application.Contracts;
+using Golinks.Application.Features.Links.Commands.CreateLink;
+using Golinks.Application.Features.Links.Commands.DeleteLink;
+using Golinks.Application.Features.Links.Commands.RegisterAccess;
+using Golinks.Application.Features.Links.Commands.UpdateLink;
+using Golinks.Application.Features.Links.Queries.GetAllLinks;
+using Golinks.Application.Features.Links.Queries.GetLinkById;
+using Golinks.Application.Features.Links.Queries.GetMetrics;
 using Golinks.Application.Requests;
-using Golinks.Application.ViewModel;
-using Golinks.Domain.Entities;
+using Golinks.Application.Responses;
 using Golinks.WebAPI.Extensions;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,114 +18,75 @@ namespace Golinks.WebAPI.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class LinksController(ILinkService linkService, IMapper mapper) : ControllerBase
+public class LinksController(IMediator mediator) : ControllerBase
 {
-    private readonly ILinkService _linkService = linkService;
-    private readonly IMapper _mapper = mapper;
-
     [HttpGet(Name = "GetAllLinks")]
-    [ProducesResponseType(typeof(RestResponse<IEnumerable<LinkViewModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
-        var (data, totalItems) = await _linkService.FindAllAsync(@params.PageNumber, @params.PageSize);
-
-        var url = Url.Action("Index", "Links", null, Request.Scheme);
-
-        var result = RestResponse<IEnumerable<LinkViewModel>>.Success(_mapper.Map<IEnumerable<LinkViewModel>>(data), url, @params.PageNumber, @params.PageSize, totalItems);
-
-        return Ok(result);
+        var baseUrl = Url.Action(nameof(Index), "Links", null, Request.Scheme);
+        var result = await mediator.Send(new GetAllLinksQuery(@params.PageNumber, @params.PageSize, baseUrl));
+        return result.ToActionResult(this, Ok);
     }
 
     [HttpGet("{id:guid}", Name = "GetLinkById")]
-    [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var data = await _linkService.FindByIdAsync(id);
-
-        if (data == null)
-        {
-            return BadRequest(RestResponse<object>.Error($"Link with ID {id} was not found."));
-        }
-
-        var result = RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(data));
-
-        return Ok(result);
+        var result = await mediator.Send(new GetLinkByIdQuery(id));
+        return result.ToActionResult(this, Ok);
     }
 
     [HttpPost(Name = "CreateLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
-    [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromBody] LinkViewModel model)
+    [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Create([FromBody] LinkRequest model)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(RestResponse<object>.Error("The request is invalid."));
-        }
-
-        var linkInDb = await _linkService.FindOneAsync(f => f.Slug == model.Slug);
-
-        if (linkInDb != null)
-        {
-            return BadRequest(RestResponse<object>.Error($"Slug \"{model.Slug}\" already exists."));
-        }
-
-        var link = _mapper.Map<Link>(model);
-
-        await _linkService.CreateAsync(link);
-
-        var result = RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
-
-        return CreatedAtAction(nameof(GetById), new { id = link.Id }, result);
+        var result = await mediator.Send(new CreateLinkCommand(model));
+        return result.ToActionResult(this, data => CreatedAtAction(nameof(GetById), new { id = data.Id }, data));
     }
 
     [HttpPut("{id:guid}", Name = "UpdateLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
-    [ProducesResponseType(typeof(RestResponse<LinkViewModel>), StatusCodes.Status202Accepted)]
-    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Update(Guid id, [FromBody] LinkViewModel model)
+    [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Update(Guid id, [FromBody] LinkRequest model)
     {
-        var linkWithSameSlug = await _linkService.FindOneAsync(x => x.Slug == model.Slug);
-
-        if (linkWithSameSlug != null && linkWithSameSlug.Id != id)
-        {
-            return BadRequest(RestResponse<object>.Error("Slug already in use."));
-        }
-
-        var linkInDb = await _linkService.FindByIdAsync(id);
-
-        if (linkInDb == null)
-        {
-            return BadRequest(RestResponse<object>.Error($"Link with ID {id} was not found."));
-        }
-
-        var link = _mapper.Map(model, linkInDb);
-
-        await _linkService.UpdateAsync(link);
-
-        var result = RestResponse<LinkViewModel>.Success(_mapper.Map<LinkViewModel>(link));
-
-        return AcceptedAtAction(nameof(GetById), new { id = link.Id }, result);
+        var result = await mediator.Send(new UpdateLinkCommand(id, model));
+        return result.ToActionResult(this, data => AcceptedAtAction(nameof(GetById), new { id = data.Id }, data));
     }
 
     [HttpDelete("{id:guid}", Name = "DeleteLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
-    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status202Accepted)]
-    [ProducesResponseType(typeof(RestResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var linkInDb = await _linkService.FindByIdAsync(id);
+        var result = await mediator.Send(new DeleteLinkCommand(id));
+        return result.ToActionResult(this, NoContent);
+    }
 
-        if (linkInDb == null)
-        {
-            return BadRequest(RestResponse<object>.Error($"Link with ID {id} was not found."));
-        }
+    [AllowAnonymous]
+    [HttpPost("register-access/{slug}", Name = "RegisterAccess")]
+    [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RegisterAccess(string slug)
+    {
+        var result = await mediator.Send(new RegisterAccessCommand(slug));
+        return result.ToActionResult(this, Ok);
+    }
 
-        await _linkService.DeleteAsync(linkInDb);
-
-        var result = RestResponse<object>.Success(new { });
-
-        return AcceptedAtAction(nameof(GetById), new { id = linkInDb.Id }, result);
+    [AllowAnonymous]
+    [HttpGet("metrics", Name = "GetLinksWithMetrics")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMetrics([FromQuery] LinkMetricParams @params)
+    {
+        var baseUrl = Url.Action(nameof(GetMetrics), "Links", null, Request.Scheme);
+        var result = await mediator.Send(new GetMetricsQuery(@params.PageNumber, @params.PageSize, @params.MetricRange, baseUrl));
+        return result.ToActionResult(this, Ok);
     }
 }

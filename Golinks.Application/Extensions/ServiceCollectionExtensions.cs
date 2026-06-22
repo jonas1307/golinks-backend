@@ -1,7 +1,9 @@
-﻿using Golinks.Application.Contracts;
-using Golinks.Application.Services;
+using FluentValidation;
+using Golinks.Application.MappingProfiles;
+using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Golinks.Application.Extensions;
 
@@ -12,10 +14,10 @@ public static class ServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(services, nameof(services));
 
-        services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
-        services.AddScoped<ILinkService, LinkService>();
-        services.AddScoped<IActionService, ActionService>();
+        var config = TypeAdapterConfig.GlobalSettings;
+        LinkProfile.Register(config);
 
-        services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

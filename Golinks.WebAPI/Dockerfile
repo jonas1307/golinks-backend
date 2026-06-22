@@ -1,20 +1,21 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 8080
+EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY ["Golinks.WebAPI/Golinks.WebAPI.csproj", "Golinks.WebAPI/"]
+COPY ["Golinks.Application/Golinks.Application.csproj", "Golinks.Application/"]
+COPY ["Golinks.Domain/Golinks.Domain.csproj", "Golinks.Domain/"]
+COPY ["Golinks.Repository/Golinks.Repository.csproj", "Golinks.Repository/"]
 RUN dotnet restore "Golinks.WebAPI/Golinks.WebAPI.csproj"
 COPY . .
 WORKDIR "/src/Golinks.WebAPI"
-RUN dotnet build "Golinks.WebAPI.csproj" -c Release -o /app/build
+RUN dotnet build "Golinks.WebAPI.csproj" -c Release --no-restore -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Golinks.WebAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Golinks.WebAPI.csproj" -c Release --no-restore -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

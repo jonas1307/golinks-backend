@@ -29,7 +29,7 @@ services:
     image: adminer:latest
     container_name: golinks.adminer
     ports:
-      - "8080:8080"
+      - "9090:8080"
     depends_on:
       - golinks.postgres
     networks:

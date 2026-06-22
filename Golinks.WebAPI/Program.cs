@@ -1,6 +1,8 @@
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Golinks.Application.Extensions;
-using Golinks.WebAPI.Extensions;
 using Golinks.Repository.Extensions;
+using Golinks.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +22,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplicationServices();
 builder.Services.AddRepositoryServices(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddControllers(options =>
+    options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseParameterTransformer())));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -35,14 +39,12 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("PermissionPolicy", policy => policy.RequireAuthenticatedUser());
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSwaggerConfiguration();
 
 var app = builder.Build();
 
 app.UseContextMigrations();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerSetup();
