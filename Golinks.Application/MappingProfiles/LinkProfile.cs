@@ -18,6 +18,9 @@ public static class LinkProfile
             .Ignore(dest => dest.UpdatedAt)
             .Ignore(dest => dest.TotalUsage);
 
+        config.NewConfig<Link, LinkMetricResponse>()
+            .Ignore(dest => dest.Metrics);
+
         config.NewConfig<MetricDTO, MetricResponse>()
             .Map(dest => dest.Date, src => src.Date.ToString("yyyy/MM/dd"));
     }
