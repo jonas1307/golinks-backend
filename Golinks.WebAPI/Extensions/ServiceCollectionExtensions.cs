@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading.RateLimiting;
 
 namespace Golinks.WebAPI.Extensions;
@@ -28,19 +26,12 @@ public static class ServiceCollectionExtensions
                     }));
 
             options.OnRejected = async (context, cancellationToken) =>
-            {
-                var problem = new ProblemDetails
-                {
-                    Status = StatusCodes.Status429TooManyRequests,
-                    Title = "Too Many Requests",
-                    Detail = "Request rate limit exceeded. Please try again later."
-                };
-
-                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-                context.HttpContext.Response.ContentType = "application/problem+json";
-
-                await context.HttpContext.Response.WriteAsync(JsonSerializer.Serialize(problem), cancellationToken);
-            };
+                await ProblemResponse.WriteAsync(
+                    context.HttpContext,
+                    StatusCodes.Status429TooManyRequests,
+                    "Too Many Requests",
+                    "Request rate limit exceeded. Please try again later.",
+                    cancellationToken);
         });
     }
 

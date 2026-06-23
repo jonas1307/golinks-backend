@@ -22,6 +22,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplicationServices();
 builder.Services.AddRepositoryServices(builder.Configuration);
 builder.Services.AddRateLimiting();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddControllers(options =>
@@ -35,6 +36,16 @@ builder.Services.AddAuthentication(options =>
 {
     options.Authority = builder.Configuration["Auth0:Authority"];
     options.Audience = builder.Configuration["Auth0:Audience"];
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = async context =>
+        {
+            context.HandleResponse();
+            await ProblemResponse.WriteAsync(context.HttpContext, StatusCodes.Status401Unauthorized, "Unauthorized", "Authentication is required to access this resource.");
+        },
+        OnForbidden = context =>
+            ProblemResponse.WriteAsync(context.HttpContext, StatusCodes.Status403Forbidden, "Forbidden", "You don't have the required permission to access this resource.")
+    };
 });
 
 builder.Services.AddAuthorizationBuilder()
@@ -49,6 +60,10 @@ app.UseContextMigrations();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerSetup();
+}
+else
+{
+    app.UseExceptionHandler();
 }
 
 app.UseCors("AllowAllOrigins");
