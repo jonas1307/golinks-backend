@@ -35,4 +35,7 @@ public class LinkMetricParams
             _metricRange = (value > MaxMetricRange) ? MaxMetricRange : value;
         }
     }
+
+    /// <summary>Free-text search applied to the URL, slug and description.</summary>
+    public string? Search { get; set; }
 }

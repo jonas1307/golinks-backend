@@ -21,16 +21,16 @@ public class MetricsController(IMediator mediator) : ControllerBase
     /// </summary>
     /// <remarks>
     /// This endpoint is public and rate limited per client IP. The metric range
-    /// (in days) and pagination are controlled through the query parameters.
+    /// (in days), pagination and free-text search are controlled through the query parameters.
     /// </remarks>
-    /// <param name="params">Pagination and metric range parameters.</param>
+    /// <param name="params">Pagination, metric range and search parameters.</param>
     /// <response code="200">Paginated list of links with their metrics.</response>
     [HttpGet(Name = "GetLinksWithMetrics")]
     [ProducesResponseType(typeof(LinkMetricResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMetrics([FromQuery] LinkMetricParams @params)
     {
         var baseUrl = Url.Action(nameof(GetMetrics), "Metrics", null, Request.Scheme);
-        var result = await mediator.Send(new GetMetricsQuery(@params.PageNumber, @params.PageSize, @params.MetricRange, baseUrl));
+        var result = await mediator.Send(new GetMetricsQuery(@params.PageNumber, @params.PageSize, @params.MetricRange, baseUrl, @params.Search));
         return result.ToActionResult(this, Ok);
     }
 }

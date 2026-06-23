@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Golinks.Application.Features.Links.Queries.GetMetrics;
 
-public record GetMetricsQuery(int PageNumber, int PageSize, int MetricRange, string? BaseUrl) : IRequest<Result<PagedResult<LinkMetricResponse>>>;
+public record GetMetricsQuery(int PageNumber, int PageSize, int MetricRange, string? BaseUrl, string? Search = null) : IRequest<Result<PagedResult<LinkMetricResponse>>>;

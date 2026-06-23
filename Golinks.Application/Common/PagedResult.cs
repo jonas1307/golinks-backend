@@ -14,9 +14,18 @@ public class PagedResult<T>
     public string? NextPage { get; init; }
     public string? PreviousPage { get; init; }
 
-    public static PagedResult<T> Create(IEnumerable<T> items, int pageNumber, int pageSize, int totalItems, string? baseUrl)
+    public static PagedResult<T> Create(
+        IEnumerable<T> items,
+        int pageNumber,
+        int pageSize,
+        int totalItems,
+        string? baseUrl,
+        IReadOnlyDictionary<string, string?>? filters = null)
     {
         var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+        var filterQuery = BuildFilterQuery(filters);
+
+        string PageUrl(int page) => $"{baseUrl}?pageNumber={page}&pageSize={pageSize}{filterQuery}";
 
         return new PagedResult<T>
         {
@@ -27,10 +36,22 @@ public class PagedResult<T>
             TotalPages = totalPages,
             HasNextPage = pageNumber < totalPages,
             HasPreviousPage = pageNumber > 1,
-            FirstPage = $"{baseUrl}?pageNumber=1&pageSize={pageSize}",
-            LastPage = $"{baseUrl}?pageNumber={totalPages}&pageSize={pageSize}",
-            NextPage = pageNumber < totalPages ? $"{baseUrl}?pageNumber={pageNumber + 1}&pageSize={pageSize}" : null,
-            PreviousPage = pageNumber > 1 ? $"{baseUrl}?pageNumber={pageNumber - 1}&pageSize={pageSize}" : null,
+            FirstPage = PageUrl(1),
+            LastPage = PageUrl(totalPages),
+            NextPage = pageNumber < totalPages ? PageUrl(pageNumber + 1) : null,
+            PreviousPage = pageNumber > 1 ? PageUrl(pageNumber - 1) : null,
         };
+    }
+
+    private static string BuildFilterQuery(IReadOnlyDictionary<string, string?>? filters)
+    {
+        if (filters is null)
+            return string.Empty;
+
+        var parts = filters
+            .Where(f => !string.IsNullOrWhiteSpace(f.Value))
+            .Select(f => $"&{Uri.EscapeDataString(f.Key)}={Uri.EscapeDataString(f.Value!)}");
+
+        return string.Concat(parts);
     }
 }

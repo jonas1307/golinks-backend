@@ -12,10 +12,21 @@ public class GetMetricsHandler(GolinksContext context) : IRequestHandler<GetMetr
 {
     public async Task<Result<PagedResult<LinkMetricResponse>>> Handle(GetMetricsQuery request, CancellationToken cancellationToken)
     {
-        var query = context.Links.AsNoTracking().OrderByDescending(x => x.TotalUsage);
+        var query = context.Links.AsNoTracking();
 
-        var totalItems = await query.CountAsync(cancellationToken);
-        var links = await query
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var pattern = $"%{request.Search}%";
+            query = query.Where(x =>
+                EF.Functions.ILike(x.Url, pattern) ||
+                EF.Functions.ILike(x.Slug, pattern) ||
+                (x.Description != null && EF.Functions.ILike(x.Description, pattern)));
+        }
+
+        var orderedQuery = query.OrderByDescending(x => x.TotalUsage);
+
+        var totalItems = await orderedQuery.CountAsync(cancellationToken);
+        var links = await orderedQuery
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
@@ -47,6 +58,11 @@ public class GetMetricsHandler(GolinksContext context) : IRequestHandler<GetMetr
             request.PageNumber,
             request.PageSize,
             totalItems,
-            request.BaseUrl);
+            request.BaseUrl,
+            new Dictionary<string, string?>
+            {
+                ["metricRange"] = request.MetricRange.ToString(),
+                ["search"] = request.Search
+            });
     }
 }
