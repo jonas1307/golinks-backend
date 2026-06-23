@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
@@ -85,11 +85,21 @@ public static class ServiceCollectionExtensions
             });
 
             s.OperationFilter<PermissionOperationFilter>();
+            s.OperationFilter<RateLimitOperationFilter>();
+            s.DocumentFilter<TagDescriptionsDocumentFilter>();
 
-            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            if (File.Exists(xmlPath))
-                s.IncludeXmlComments(xmlPath);
+            IncludeXmlComments(s, Assembly.GetExecutingAssembly().GetName().Name);
+            IncludeXmlComments(s, "Golinks.Application");
         });
+    }
+
+    private static void IncludeXmlComments(SwaggerGenOptions options, string? assemblyName)
+    {
+        if (string.IsNullOrEmpty(assemblyName))
+            return;
+
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{assemblyName}.xml");
+        if (File.Exists(xmlPath))
+            options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
     }
 }

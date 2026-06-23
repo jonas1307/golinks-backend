@@ -1,5 +1,6 @@
 using Golinks.Application.Features.Links.Queries.GetMetrics;
 using Golinks.Application.Requests;
+using Golinks.Application.Responses;
 using Golinks.WebAPI.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -18,9 +19,14 @@ public class MetricsController(IMediator mediator) : ControllerBase
     /// <summary>
     /// Lists links along with their access metrics over a given period.
     /// </summary>
+    /// <remarks>
+    /// This endpoint is public and rate limited per client IP. The metric range
+    /// (in days) and pagination are controlled through the query parameters.
+    /// </remarks>
+    /// <param name="params">Pagination and metric range parameters.</param>
+    /// <response code="200">Paginated list of links with their metrics.</response>
     [HttpGet(Name = "GetLinksWithMetrics")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType(typeof(LinkMetricResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMetrics([FromQuery] LinkMetricParams @params)
     {
         var baseUrl = Url.Action(nameof(GetMetrics), "Metrics", null, Request.Scheme);

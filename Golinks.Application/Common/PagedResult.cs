@@ -14,7 +14,7 @@ public class PagedResult<T>
     public string? NextPage { get; init; }
     public string? PreviousPage { get; init; }
 
-    public static PagedResult<T> Create(IEnumerable<T> items, int pageNumber, int pageSize, int totalItems, string baseUrl)
+    public static PagedResult<T> Create(IEnumerable<T> items, int pageNumber, int pageSize, int totalItems, string? baseUrl)
     {
         var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 

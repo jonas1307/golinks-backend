@@ -21,9 +21,12 @@ public class LinksController(IMediator mediator) : ControllerBase
     /// <summary>
     /// Lists all links with pagination.
     /// </summary>
+    /// <param name="params">Pagination parameters (page number and page size).</param>
+    /// <response code="200">Paginated list of links.</response>
+    /// <response code="401">The request is not authenticated.</response>
     [HttpGet(Name = "GetAllLinks")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
         var baseUrl = Url.Action(nameof(Index), "Links", null, Request.Scheme);
@@ -34,10 +37,14 @@ public class LinksController(IMediator mediator) : ControllerBase
     /// <summary>
     /// Gets a single link by its unique identifier.
     /// </summary>
+    /// <param name="id">The unique identifier of the link.</param>
+    /// <response code="200">The requested link.</response>
+    /// <response code="401">The request is not authenticated.</response>
+    /// <response code="404">No link was found with the given identifier.</response>
     [HttpGet("{id:guid}", Name = "GetLinkById")]
     [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await mediator.Send(new GetLinkByIdQuery(id));
@@ -47,13 +54,19 @@ public class LinksController(IMediator mediator) : ControllerBase
     /// <summary>
     /// Creates a new link.
     /// </summary>
+    /// <param name="model">The link data to create.</param>
+    /// <response code="201">The link was created.</response>
+    /// <response code="400">The request body failed validation.</response>
+    /// <response code="401">The request is not authenticated.</response>
+    /// <response code="403">The authenticated user lacks the required permission.</response>
+    /// <response code="409">A link with the same slug already exists.</response>
     [HttpPost(Name = "CreateLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
     [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create([FromBody] LinkRequest model)
     {
         var result = await mediator.Send(new CreateLinkCommand(model));
@@ -63,13 +76,20 @@ public class LinksController(IMediator mediator) : ControllerBase
     /// <summary>
     /// Updates an existing link.
     /// </summary>
+    /// <param name="id">The unique identifier of the link to update.</param>
+    /// <param name="model">The new link data.</param>
+    /// <response code="202">The link was updated.</response>
+    /// <response code="401">The request is not authenticated.</response>
+    /// <response code="403">The authenticated user lacks the required permission.</response>
+    /// <response code="404">No link was found with the given identifier.</response>
+    /// <response code="409">Another link already uses the given slug.</response>
     [HttpPut("{id:guid}", Name = "UpdateLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
     [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Update(Guid id, [FromBody] LinkRequest model)
     {
         var result = await mediator.Send(new UpdateLinkCommand(id, model));
@@ -79,12 +99,17 @@ public class LinksController(IMediator mediator) : ControllerBase
     /// <summary>
     /// Deletes a link by its unique identifier.
     /// </summary>
+    /// <param name="id">The unique identifier of the link to delete.</param>
+    /// <response code="204">The link was deleted.</response>
+    /// <response code="401">The request is not authenticated.</response>
+    /// <response code="403">The authenticated user lacks the required permission.</response>
+    /// <response code="404">No link was found with the given identifier.</response>
     [HttpDelete("{id:guid}", Name = "DeleteLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await mediator.Send(new DeleteLinkCommand(id));
