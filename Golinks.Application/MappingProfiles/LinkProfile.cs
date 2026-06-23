@@ -15,7 +15,7 @@ public static class LinkProfile
         config.NewConfig<LinkRequest, Link>()
             .Ignore(dest => dest.Id)
             .Ignore(dest => dest.CreatedAt)
-            .Ignore(dest => dest.UpdatedAt)
+            .Ignore(dest => dest.UpdatedAt!)
             .Ignore(dest => dest.TotalUsage);
 
         config.NewConfig<Link, LinkMetricResponse>()

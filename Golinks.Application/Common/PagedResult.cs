@@ -9,10 +9,10 @@ public class PagedResult<T>
     public int TotalPages { get; init; }
     public bool HasNextPage { get; init; }
     public bool HasPreviousPage { get; init; }
-    public string FirstPage { get; init; }
-    public string LastPage { get; init; }
-    public string NextPage { get; init; }
-    public string PreviousPage { get; init; }
+    public string FirstPage { get; init; } = string.Empty;
+    public string LastPage { get; init; } = string.Empty;
+    public string? NextPage { get; init; }
+    public string? PreviousPage { get; init; }
 
     public static PagedResult<T> Create(IEnumerable<T> items, int pageNumber, int pageSize, int totalItems, string baseUrl)
     {

@@ -31,7 +31,7 @@ public class GolinksContext(DbContextOptions<GolinksContext> options) : DbContex
         return base.SaveChangesAsync(cancellationToken);
     }
 
-    private IDbContextTransaction _currentTransaction;
+    private IDbContextTransaction? _currentTransaction;
 
     public async Task BeginTransactionAsync()
     {
