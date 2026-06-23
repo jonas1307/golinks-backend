@@ -7,6 +7,7 @@ public class LinkMetricResponse
     public required string Slug { get; set; }
     public string? Description { get; set; }
     public DateTime? ExpiresAt { get; set; }
+    public int? MaxUsage { get; set; }
     public DateTime CreatedAt { get; set; }
     public int TotalUsage { get; set; }
     public List<MetricResponse> Metrics { get; set; } = [];

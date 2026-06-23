@@ -25,7 +25,7 @@ public class RedirectController(IMediator mediator) : ControllerBase
     /// <param name="slug">The short slug to resolve.</param>
     /// <response code="302">Redirects to the original URL.</response>
     /// <response code="404">No link was found with the given slug.</response>
-    /// <response code="410">The link exists but has expired.</response>
+    /// <response code="410">The link exists but is no longer available (expired or usage limit reached).</response>
     [HttpGet("{slug}")]
     [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

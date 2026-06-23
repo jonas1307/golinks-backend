@@ -25,5 +25,10 @@ public class LinkRequestValidator : AbstractValidator<LinkRequest>
             .GreaterThan(DateTime.UtcNow)
             .When(x => x.ExpiresAt.HasValue)
             .WithMessage("'Expires At' must be a future date.");
+
+        RuleFor(x => x.MaxUsage)
+            .GreaterThan(0)
+            .When(x => x.MaxUsage.HasValue)
+            .WithMessage("'Max Usage' must be greater than zero.");
     }
 }

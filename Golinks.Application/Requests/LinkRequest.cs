@@ -17,4 +17,8 @@ public class LinkRequest
     /// <summary>Optional UTC expiration. After this moment the link returns 410 Gone on redirect.</summary>
     /// <example>2026-12-31T23:59:59Z</example>
     public DateTime? ExpiresAt { get; set; }
+
+    /// <summary>Optional maximum number of accesses. Once reached the link returns 410 Gone on redirect.</summary>
+    /// <example>100</example>
+    public int? MaxUsage { get; set; }
 }

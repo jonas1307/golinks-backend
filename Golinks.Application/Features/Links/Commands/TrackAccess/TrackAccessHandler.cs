@@ -24,6 +24,9 @@ public class TrackAccessHandler(GolinksContext context) : IRequestHandler<TrackA
         if (link.IsExpired)
             return Error.Gone("This link has expired.");
 
+        if (link.HasReachedUsageLimit)
+            return Error.Gone("This link has reached its usage limit.");
+
         await context.BeginTransactionAsync();
 
         try
