@@ -16,6 +16,7 @@ public static class ResultExtensions
                 ErrorType.NotFound => controller.Problem(detail: error.Description, statusCode: 404),
                 ErrorType.Conflict => controller.Problem(detail: error.Description, statusCode: 409),
                 ErrorType.Validation => controller.Problem(detail: error.Description, statusCode: 400),
+                ErrorType.Gone => controller.Problem(detail: error.Description, statusCode: 410),
                 _ => controller.Problem(detail: error.Description, statusCode: 500)
             });
 
@@ -30,6 +31,7 @@ public static class ResultExtensions
                 ErrorType.NotFound => controller.Problem(detail: error.Description, statusCode: 404),
                 ErrorType.Conflict => controller.Problem(detail: error.Description, statusCode: 409),
                 ErrorType.Validation => controller.Problem(detail: error.Description, statusCode: 400),
+                ErrorType.Gone => controller.Problem(detail: error.Description, statusCode: 410),
                 _ => controller.Problem(detail: error.Description, statusCode: 500)
             });
 }

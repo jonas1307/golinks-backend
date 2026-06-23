@@ -13,4 +13,8 @@ public class LinkRequest
     /// <summary>An optional human-friendly description of the link.</summary>
     /// <example>Golinks backend repository</example>
     public string? Description { get; set; }
+
+    /// <summary>Optional UTC expiration. After this moment the link returns 410 Gone on redirect.</summary>
+    /// <example>2026-12-31T23:59:59Z</example>
+    public DateTime? ExpiresAt { get; set; }
 }

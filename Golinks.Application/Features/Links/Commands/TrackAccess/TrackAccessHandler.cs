@@ -21,6 +21,9 @@ public class TrackAccessHandler(GolinksContext context) : IRequestHandler<TrackA
         if (link == null)
             return Error.NotFound("No link was found with the given slug.");
 
+        if (link.IsExpired)
+            return Error.Gone("This link has expired.");
+
         await context.BeginTransactionAsync();
 
         try
