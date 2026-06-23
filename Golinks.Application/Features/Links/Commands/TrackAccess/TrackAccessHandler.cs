@@ -6,11 +6,11 @@ using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Golinks.Application.Features.Links.Commands.RegisterAccess;
+namespace Golinks.Application.Features.Links.Commands.TrackAccess;
 
-public class RegisterAccessHandler(GolinksContext context) : IRequestHandler<RegisterAccessCommand, Result<LinkResponse>>
+public class TrackAccessHandler(GolinksContext context) : IRequestHandler<TrackAccessCommand, Result<LinkResponse>>
 {
-    public async Task<Result<LinkResponse>> Handle(RegisterAccessCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LinkResponse>> Handle(TrackAccessCommand request, CancellationToken cancellationToken)
     {
         var link = await context.Links
             .AsNoTracking()

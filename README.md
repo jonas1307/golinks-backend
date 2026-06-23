@@ -28,17 +28,17 @@ Errors are handled with the `Result<T>` pattern and returned as `ProblemDetails`
 
 ## Endpoints
 
-Routes follow kebab-case convention. Base: `/links`
+Routes follow kebab-case convention.
 
 | Method | Route | Auth | Description |
 |--------|-------|------|-------------|
+| `GET` | `/{slug}` | Public | Redirect to the original URL and track the access |
 | `GET` | `/links` | Required | List links (paginated) |
 | `GET` | `/links/{id}` | Required | Get link by ID |
 | `POST` | `/links` | `golinks:admin` | Create a link |
 | `PUT` | `/links/{id}` | `golinks:admin` | Update a link |
 | `DELETE` | `/links/{id}` | `golinks:admin` | Delete a link |
-| `POST` | `/links/register-access/{slug}` | Public | Register an access to a slug |
-| `GET` | `/links/metrics` | Public | List links with access metrics |
+| `GET` | `/metrics` | Public | List links with access metrics |
 
 ## Prerequisites
 
@@ -101,7 +101,7 @@ Features/Links/
     CreateLink/
     UpdateLink/
     DeleteLink/
-    RegisterAccess/
+    TrackAccess/
   Queries/
     GetAllLinks/
     GetLinkById/
