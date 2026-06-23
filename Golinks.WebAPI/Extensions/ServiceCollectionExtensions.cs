@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.RateLimiting;
 
@@ -62,10 +63,10 @@ public static class ServiceCollectionExtensions
             {
                 Description = "Input the JWT like: Bearer {your token}",
                 Name = "Authorization",
-                Scheme = "Bearer",
+                Scheme = "bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey
+                Type = SecuritySchemeType.Http
             });
 
             s.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -83,6 +84,12 @@ public static class ServiceCollectionExtensions
                 }
             });
 
+            s.OperationFilter<PermissionOperationFilter>();
+
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            if (File.Exists(xmlPath))
+                s.IncludeXmlComments(xmlPath);
         });
     }
 }

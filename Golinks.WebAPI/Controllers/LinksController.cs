@@ -18,8 +18,12 @@ namespace Golinks.WebAPI.Controllers;
 [Produces("application/json")]
 public class LinksController(IMediator mediator) : ControllerBase
 {
+    /// <summary>
+    /// Lists all links with pagination.
+    /// </summary>
     [HttpGet(Name = "GetAllLinks")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
         var baseUrl = Url.Action(nameof(Index), "Links", null, Request.Scheme);
@@ -27,8 +31,12 @@ public class LinksController(IMediator mediator) : ControllerBase
         return result.ToActionResult(this, Ok);
     }
 
+    /// <summary>
+    /// Gets a single link by its unique identifier.
+    /// </summary>
     [HttpGet("{id:guid}", Name = "GetLinkById")]
     [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -36,10 +44,15 @@ public class LinksController(IMediator mediator) : ControllerBase
         return result.ToActionResult(this, Ok);
     }
 
+    /// <summary>
+    /// Creates a new link.
+    /// </summary>
     [HttpPost(Name = "CreateLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
     [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create([FromBody] LinkRequest model)
     {
@@ -47,9 +60,14 @@ public class LinksController(IMediator mediator) : ControllerBase
         return result.ToActionResult(this, data => CreatedAtAction(nameof(GetById), new { id = data.Id }, data));
     }
 
+    /// <summary>
+    /// Updates an existing link.
+    /// </summary>
     [HttpPut("{id:guid}", Name = "UpdateLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
     [ProducesResponseType(typeof(LinkResponse), StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Update(Guid id, [FromBody] LinkRequest model)
@@ -58,9 +76,14 @@ public class LinksController(IMediator mediator) : ControllerBase
         return result.ToActionResult(this, data => AcceptedAtAction(nameof(GetById), new { id = data.Id }, data));
     }
 
+    /// <summary>
+    /// Deletes a link by its unique identifier.
+    /// </summary>
     [HttpDelete("{id:guid}", Name = "DeleteLink")]
     [PermissionRequirement("golinks:admin", AuthenticationSchemes = "Bearer", Policy = "PermissionPolicy")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {

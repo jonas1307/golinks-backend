@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using Swashbuckle.AspNetCore.SwaggerUI;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Golinks.WebAPI.Extensions;
 
@@ -13,6 +14,9 @@ public static class ApplicationBuilderExtensions
         app.UseSwaggerUI(c =>
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            c.DisplayRequestDuration();
+            c.DocExpansion(DocExpansion.None);
+            c.EnablePersistAuthorization();
         });
     }
 }

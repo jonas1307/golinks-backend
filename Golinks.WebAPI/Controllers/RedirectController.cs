@@ -14,9 +14,13 @@ namespace Golinks.WebAPI.Controllers;
 [EnableRateLimiting("public")]
 public class RedirectController(IMediator mediator) : ControllerBase
 {
+    /// <summary>
+    /// Redirects to the original URL for the given slug and tracks the access.
+    /// </summary>
     [HttpGet("{slug}")]
     [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> RedirectToUrl(string slug)
     {
         var userAgent = Request.Headers.UserAgent.ToString();
