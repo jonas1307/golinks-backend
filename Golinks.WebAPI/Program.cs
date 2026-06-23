@@ -21,6 +21,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddApplicationServices();
 builder.Services.AddRepositoryServices(builder.Configuration);
+builder.Services.AddRateLimiting();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddControllers(options =>
@@ -57,6 +58,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<PermissionMiddleware>();
+app.UseRateLimiter();
 
 app.MapControllers();
 

@@ -3,6 +3,7 @@ using Golinks.WebAPI.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Golinks.WebAPI.Controllers;
 
@@ -10,6 +11,7 @@ namespace Golinks.WebAPI.Controllers;
 [ApiController]
 [Route("")]
 [Produces("application/json")]
+[EnableRateLimiting("public")]
 public class RedirectController(IMediator mediator) : ControllerBase
 {
     [HttpGet("{slug}")]

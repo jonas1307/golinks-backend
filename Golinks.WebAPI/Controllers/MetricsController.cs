@@ -4,6 +4,7 @@ using Golinks.WebAPI.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Golinks.WebAPI.Controllers;
 
@@ -11,6 +12,7 @@ namespace Golinks.WebAPI.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
+[EnableRateLimiting("public")]
 public class MetricsController(IMediator mediator) : ControllerBase
 {
     [HttpGet(Name = "GetLinksWithMetrics")]
