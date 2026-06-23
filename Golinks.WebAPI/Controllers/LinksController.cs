@@ -3,6 +3,7 @@ using Golinks.Application.Features.Links.Commands.DeleteLink;
 using Golinks.Application.Features.Links.Commands.UpdateLink;
 using Golinks.Application.Features.Links.Queries.GetAllLinks;
 using Golinks.Application.Features.Links.Queries.GetLinkById;
+using Golinks.Application.Features.Links.Queries.GetLinkQrCode;
 using Golinks.Application.Requests;
 using Golinks.Application.Responses;
 using Golinks.WebAPI.Extensions;
@@ -16,7 +17,7 @@ namespace Golinks.WebAPI.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class LinksController(IMediator mediator) : ControllerBase
+public class LinksController(IMediator mediator, IConfiguration configuration) : ControllerBase
 {
     /// <summary>
     /// Lists all links with pagination.
@@ -94,6 +95,25 @@ public class LinksController(IMediator mediator) : ControllerBase
     {
         var result = await mediator.Send(new UpdateLinkCommand(id, model));
         return result.ToActionResult(this, data => AcceptedAtAction(nameof(GetById), new { id = data.Id }, data));
+    }
+
+    /// <summary>
+    /// Generates a PNG QR code that encodes the public redirect URL of the link.
+    /// </summary>
+    /// <param name="id">The unique identifier of the link.</param>
+    /// <response code="200">The QR code image as a PNG.</response>
+    /// <response code="401">The request is not authenticated.</response>
+    /// <response code="404">No link was found with the given identifier.</response>
+    [HttpGet("{id:guid}/qrcode", Name = "GetLinkQrCode")]
+    [Produces("image/png")]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetQrCode(Guid id)
+    {
+        var baseUrl = configuration["PublicBaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
+        var result = await mediator.Send(new GetLinkQrCodeQuery(id, baseUrl));
+        return result.ToActionResult(this, bytes => File(bytes, "image/png"));
     }
 
     /// <summary>
