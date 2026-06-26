@@ -16,6 +16,16 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
+      - name: Apply Replace Tokens
+        uses: cschleiden/replace-tokens@v1
+        with:
+          files: '["**/appsettings.Production.json"]'
+        env:
+          DefaultConnectionString: ${{ secrets.DEFAULTCONNECTIONSTRING }}
+          Auth0Audience: ${{ secrets.AUTH0_AUDIENCE }}
+          Auth0Authority: ${{ secrets.AUTH0_AUTHORITY }}
+          PublicBaseUrl: ${{ secrets.PUBLIC_BASE_URL }}
+
       - name: Deploy to Railway
         run: railway up --service ${{ secrets.RAILWAY_SERVICE_ID }} --ci
         env:
