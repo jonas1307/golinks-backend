@@ -19,10 +19,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore Golinks.slnf
 
       - name: Verify formatting
-        run: dotnet format whitespace --verify-no-changes --no-restore
+        run: dotnet format whitespace Golinks.slnf --verify-no-changes --no-restore
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build Golinks.slnf --no-restore --configuration Release
