@@ -1,4 +1,4 @@
-﻿using Golinks.Domain.Entities;
+using Golinks.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

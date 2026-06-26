@@ -1,10 +1,8 @@
-﻿
-namespace Golinks.Domain.DTOs
+namespace Golinks.Domain.DTOs;
+
+public class MetricDTO
 {
-    public class MetricDTO
-    {
-        public Guid LinkId { get; set; }
-        public DateTime Date { get; set; }
-        public int TotalClicks { get; set; }
-    }
+    public Guid LinkId { get; set; }
+    public DateTime Date { get; set; }
+    public int TotalClicks { get; set; }
 }
