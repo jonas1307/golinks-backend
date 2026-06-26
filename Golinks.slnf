@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "path": "Golinks.sln",
+    "projects": [
+      "Golinks.Application\\Golinks.Application.csproj",
+      "Golinks.Domain\\Golinks.Domain.csproj",
+      "Golinks.Repository\\Golinks.Repository.csproj",
+      "Golinks.WebAPI\\Golinks.WebAPI.csproj"
+    ]
+  }
+}

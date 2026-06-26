@@ -1,4 +1,4 @@
-﻿namespace Golinks.Domain.Entities;
+namespace Golinks.Domain.Entities;
 
 public class Metric : BaseEntity
 {

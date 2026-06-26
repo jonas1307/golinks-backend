@@ -1,4 +1,4 @@
-﻿namespace Golinks.Application.Requests;
+namespace Golinks.Application.Requests;
 
 public class LinkMetricParams
 {
