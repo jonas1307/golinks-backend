@@ -1,9 +1,11 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Golinks.Application.Extensions;
+using Golinks.Repository;
 using Golinks.Repository.Extensions;
 using Golinks.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,9 @@ builder.Services.AddApplicationServices();
 builder.Services.AddRepositoryServices(builder.Configuration);
 builder.Services.AddRateLimiting();
 builder.Services.AddProblemDetails();
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<GolinksContext>(name: "database", tags: ["ready"]);
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddControllers(options =>
@@ -76,5 +81,8 @@ app.UseMiddleware<PermissionMiddleware>();
 app.UseRateLimiter();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
+app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 
 app.Run();

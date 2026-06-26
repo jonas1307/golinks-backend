@@ -38,7 +38,10 @@ Routes follow kebab-case convention.
 | `POST` | `/links` | `golinks:admin` | Create a link |
 | `PUT` | `/links/{id}` | `golinks:admin` | Update a link |
 | `DELETE` | `/links/{id}` | `golinks:admin` | Delete a link |
+| `GET` | `/links/{id}/qrcode` | Required | Get a PNG QR code for the link's public URL |
 | `GET` | `/metrics` | Public | List links with access metrics |
+| `GET` | `/health/live` | Public | Liveness probe (process is responding) |
+| `GET` | `/health/ready` | Public | Readiness probe (database is reachable) |
 
 ## Prerequisites
 
