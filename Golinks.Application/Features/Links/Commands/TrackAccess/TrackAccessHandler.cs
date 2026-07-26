@@ -1,5 +1,6 @@
 using Golinks.Application.Common;
 using Golinks.Application.Responses;
+using Golinks.Application.Services;
 using Golinks.Domain.Entities;
 using Golinks.Repository;
 using Mapster;
@@ -35,12 +36,19 @@ public class TrackAccessHandler(GolinksContext context) : IRequestHandler<TrackA
                 .Where(x => x.Slug == request.Slug)
                 .ExecuteUpdateAsync(s => s.SetProperty(l => l.TotalUsage, l => l.TotalUsage + 1), cancellationToken);
 
+            var parsed = UserAgentParser.Parse(request.UserAgent);
+
             context.Metrics.Add(new Metric
             {
                 LinkId = link.Id,
                 UserAgent = request.UserAgent,
                 Referrer = request.Referrer,
-                IpHash = HashIp(request.IpAddress)
+                IpHash = HashIp(request.IpAddress),
+                DeviceType = parsed?.DeviceType,
+                DeviceModel = parsed?.DeviceModel,
+                Browser = parsed?.Browser,
+                Os = parsed?.Os,
+                IsBot = parsed?.IsBot ?? false
             });
 
             await context.SaveChangesAsync(cancellationToken);
