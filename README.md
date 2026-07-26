@@ -40,6 +40,8 @@ Routes follow kebab-case convention.
 | `DELETE` | `/links/{id}` | `golinks:admin` | Delete a link |
 | `GET` | `/links/{id}/qrcode` | Required | Get a PNG QR code for the link's public URL |
 | `GET` | `/metrics` | Public | List links with access metrics |
+| `GET` | `/dashboard` | Required | Get analytics dashboard (clicks, device, browser, OS, heatmap) |
+| `POST` | `/dashboard/backfill-ua` | `golinks:admin` | Parse stored User-Agent strings on existing metric records |
 | `GET` | `/health/live` | Public | Liveness probe (process is responding) |
 | `GET` | `/health/ready` | Public | Readiness probe (database is reachable) |
 
@@ -96,7 +98,7 @@ Swagger documentation is available at `http://localhost:<port>/swagger` in the d
 
 ## Feature Structure
 
-Each feature follows the vertical slice pattern inside `Golinks.Application/Features/Links`:
+Each feature follows the vertical slice pattern inside `Golinks.Application/Features/`:
 
 ```
 Features/Links/
@@ -109,6 +111,11 @@ Features/Links/
     GetAllLinks/
     GetLinkById/
     GetMetrics/
+Features/Metrics/
+  Commands/
+    BackfillUserAgents/
+  Queries/
+    GetDashboard/
 ```
 
 ## Authentication

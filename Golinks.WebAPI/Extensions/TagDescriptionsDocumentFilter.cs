@@ -13,6 +13,7 @@ public class TagDescriptionsDocumentFilter : IDocumentFilter
         [
             new OpenApiTag { Name = "Links", Description = "Authenticated CRUD operations for managing links." },
             new OpenApiTag { Name = "Metrics", Description = "Public access metrics aggregated per link." },
+            new OpenApiTag { Name = "Dashboard", Description = "Authenticated analytics: click aggregations by device, browser, OS and time." },
             new OpenApiTag { Name = "Redirect", Description = "Public redirection from a slug to its original URL." }
         ];
     }
