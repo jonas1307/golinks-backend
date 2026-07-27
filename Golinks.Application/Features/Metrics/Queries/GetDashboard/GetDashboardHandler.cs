@@ -54,7 +54,8 @@ public class GetDashboardHandler(GolinksContext context, IMemoryCache cache, Das
         var uniqueVisitors = visitorsByIp.Count;
         var returningVisitors = visitorsByIp.Count(g => g.Select(m => m.CreatedAt.Date).Distinct().Count() > 1);
         var newVisitors = uniqueVisitors - returningVisitors;
-        var avgClicksPerVisitor = uniqueVisitors > 0 ? Math.Round((double)totalClicks / uniqueVisitors, 1) : 0;
+        var trackedClicks = visitorsByIp.Sum(g => g.Count());
+        var avgClicksPerVisitor = uniqueVisitors > 0 ? Math.Round((double)trackedClicks / uniqueVisitors, 1) : 0;
 
         var byDevice = metrics
             .Where(m => m.DeviceType != null)
