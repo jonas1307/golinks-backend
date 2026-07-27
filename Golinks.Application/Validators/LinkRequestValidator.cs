@@ -5,6 +5,11 @@ namespace Golinks.Application.Validators;
 
 public class LinkRequestValidator : AbstractValidator<LinkRequest>
 {
+    private static readonly HashSet<string> ReservedSlugs =
+    [
+        "dashboard", "admin", "links", "metrics", "health"
+    ];
+
     public LinkRequestValidator()
     {
         RuleFor(x => x.Url)
@@ -16,7 +21,9 @@ public class LinkRequestValidator : AbstractValidator<LinkRequest>
 
         RuleFor(x => x.Slug)
             .NotEmpty()
-            .MaximumLength(100);
+            .MaximumLength(100)
+            .Must(slug => !ReservedSlugs.Contains(slug.ToLowerInvariant()))
+            .WithMessage("'Slug' uses a reserved name.");
 
         RuleFor(x => x.Description)
             .MaximumLength(500);

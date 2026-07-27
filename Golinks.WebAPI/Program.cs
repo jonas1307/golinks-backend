@@ -21,6 +21,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddMemoryCache();
 builder.Services.AddApplicationServices();
 builder.Services.AddRepositoryServices(builder.Configuration);
 builder.Services.AddRateLimiting();

@@ -1,5 +1,6 @@
 using FluentValidation;
 using Golinks.Application.MappingProfiles;
+using Golinks.Application.Services;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -19,5 +20,6 @@ public static class ServiceCollectionExtensions
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddSingleton<DashboardCacheService>();
     }
 }
