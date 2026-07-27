@@ -4,6 +4,10 @@ public class DashboardResponse
 {
     public int TotalClicks { get; set; }
     public int BotClicks { get; set; }
+    public int UniqueVisitors { get; set; }
+    public int NewVisitors { get; set; }
+    public int ReturningVisitors { get; set; }
+    public double AvgClicksPerVisitor { get; set; }
     public List<LabelCountResponse> ByDevice { get; set; } = [];
     public List<LabelCountResponse> ByDeviceModel { get; set; } = [];
     public List<LabelCountResponse> ByBrowser { get; set; } = [];
