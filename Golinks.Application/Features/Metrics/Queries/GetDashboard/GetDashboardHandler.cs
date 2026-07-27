@@ -38,12 +38,23 @@ public class GetDashboardHandler(GolinksContext context, IMemoryCache cache, Das
                 m.DeviceModel,
                 m.Browser,
                 m.Os,
-                m.IsBot
+                m.IsBot,
+                m.IpHash
             })
             .ToListAsync(cancellationToken);
 
         var totalClicks = metrics.Count;
         var botClicks = metrics.Count(m => m.IsBot);
+
+        var visitorsByIp = metrics
+            .Where(m => m.IpHash != null)
+            .GroupBy(m => m.IpHash!)
+            .ToList();
+
+        var uniqueVisitors = visitorsByIp.Count;
+        var returningVisitors = visitorsByIp.Count(g => g.Select(m => m.CreatedAt.Date).Distinct().Count() > 1);
+        var newVisitors = uniqueVisitors - returningVisitors;
+        var avgClicksPerVisitor = uniqueVisitors > 0 ? Math.Round((double)totalClicks / uniqueVisitors, 1) : 0;
 
         var byDevice = metrics
             .Where(m => m.DeviceType != null)
@@ -99,6 +110,10 @@ public class GetDashboardHandler(GolinksContext context, IMemoryCache cache, Das
         {
             TotalClicks = totalClicks,
             BotClicks = botClicks,
+            UniqueVisitors = uniqueVisitors,
+            NewVisitors = newVisitors,
+            ReturningVisitors = returningVisitors,
+            AvgClicksPerVisitor = avgClicksPerVisitor,
             ByDevice = byDevice,
             ByDeviceModel = byDeviceModel,
             ByBrowser = byBrowser,
