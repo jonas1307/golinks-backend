@@ -34,7 +34,7 @@ public class RedirectController(IMediator mediator) : ControllerBase
     {
         var userAgent = Request.Headers.UserAgent.ToString();
         var referrer = Request.Headers.Referer.ToString();
-        var ip = Request.Headers["X-Forwarded-For"].FirstOrDefault()
+        var ip = Request.Headers["X-Forwarded-For"].FirstOrDefault()?.Split(',')[0].Trim()
             ?? HttpContext.Connection.RemoteIpAddress?.ToString();
 
         var result = await mediator.Send(new TrackAccessCommand(slug, userAgent, referrer, ip));
