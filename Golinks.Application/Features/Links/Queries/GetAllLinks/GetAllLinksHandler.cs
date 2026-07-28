@@ -13,6 +13,17 @@ public class GetAllLinksHandler(GolinksContext context) : IRequestHandler<GetAll
     {
         var query = context.Links.AsNoTracking();
 
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var term = $"%{request.Search.Trim()}%";
+            query = query.Where(l =>
+                EF.Functions.ILike(l.Slug, term) ||
+                EF.Functions.ILike(l.Url, term) ||
+                (l.Description != null && EF.Functions.ILike(l.Description, term)));
+        }
+
+        query = query.OrderByDescending(l => l.CreatedAt);
+
         var totalItems = await query.CountAsync(cancellationToken);
         var data = await query
             .Skip((request.PageNumber - 1) * request.PageSize)
