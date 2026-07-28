@@ -8,6 +8,7 @@ services:
       dockerfile: Golinks.WebAPI/Dockerfile
     depends_on:
       - golinks.postgres
+      - golinks.seq
     networks:
       - golinks_network
 
@@ -25,6 +26,20 @@ services:
     volumes:
       - golinks_postgres:/var/lib/postgresql/data
 
+  golinks.seq:
+    image: datalust/seq:latest
+    container_name: golinks.seq
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_ADMINPASSWORDHASH: "QAsBtwO3/cyKAPcALv6Fa1r879ADuTvsKm/D4jpFPXpRtF/MAnPX0r62u1HpznrBSBxMckFsGx+mbWxxnPwf36oxO4KkCpGUgfodLVxIUOeN"
+    ports:
+      - "5341:5341"
+      - "8082:80"
+    networks:
+      - golinks_network
+    volumes:
+      - golinks_seq:/data
+
   golinks.adminer:
     image: adminer:latest
     container_name: golinks.adminer
@@ -41,4 +56,5 @@ networks:
 
 volumes:
   golinks_postgres:
+  golinks_seq:
   
