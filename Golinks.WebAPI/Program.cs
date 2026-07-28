@@ -6,84 +6,117 @@ using Golinks.Repository.Extensions;
 using Golinks.WebAPI.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-builder.WebHost.UseKestrel(option => option.AddServerHeader = false);
-
-builder.Services.AddCors(options =>
+try
 {
-    options.AddPolicy("AllowAllOrigins", builder =>
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.WebHost.UseKestrel(option => option.AddServerHeader = false);
+
+    builder.Services.AddSerilog((services, configuration) => configuration
+        .ReadFrom.Configuration(builder.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext());
+
+    builder.Services.AddCors(options =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-    });
-});
-
-builder.Services.AddMemoryCache();
-builder.Services.AddApplicationServices();
-builder.Services.AddRepositoryServices(builder.Configuration);
-builder.Services.AddRateLimiting();
-builder.Services.AddProblemDetails();
-
-builder.Services.AddHealthChecks()
-    .AddDbContextCheck<GolinksContext>(name: "database", tags: ["ready"]);
-
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddControllers(options =>
-    options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseParameterTransformer())));
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.Authority = builder.Configuration["Auth0:Authority"];
-    options.Audience = builder.Configuration["Auth0:Audience"];
-    options.Events = new JwtBearerEvents
-    {
-        OnChallenge = async context =>
+        options.AddPolicy("AllowAllOrigins", builder =>
         {
-            context.HandleResponse();
-            await ProblemResponse.WriteAsync(context.HttpContext, StatusCodes.Status401Unauthorized, "Unauthorized", "Authentication is required to access this resource.");
-        },
-        OnForbidden = context =>
-            ProblemResponse.WriteAsync(context.HttpContext, StatusCodes.Status403Forbidden, "Forbidden", "You don't have the required permission to access this resource.")
-    };
-});
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+    });
 
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("PermissionPolicy", policy => policy.RequireAuthenticatedUser());
+    builder.Services.AddMemoryCache();
+    builder.Services.AddApplicationServices();
+    builder.Services.AddRepositoryServices(builder.Configuration);
+    builder.Services.AddRateLimiting();
+    builder.Services.AddProblemDetails();
 
-builder.Services.AddSwaggerConfiguration();
+    builder.Services.AddHealthChecks()
+        .AddDbContextCheck<GolinksContext>(name: "database", tags: ["ready"]);
 
-var app = builder.Build();
+    builder.Services.AddFluentValidationAutoValidation();
+    builder.Services.AddControllers(options =>
+        options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseParameterTransformer())));
 
-app.UseContextMigrations();
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(options =>
+    {
+        options.Authority = builder.Configuration["Auth0:Authority"];
+        options.Audience = builder.Configuration["Auth0:Audience"];
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = async context =>
+            {
+                context.HandleResponse();
+                await ProblemResponse.WriteAsync(context.HttpContext, StatusCodes.Status401Unauthorized, "Unauthorized", "Authentication is required to access this resource.");
+            },
+            OnForbidden = context =>
+                ProblemResponse.WriteAsync(context.HttpContext, StatusCodes.Status403Forbidden, "Forbidden", "You don't have the required permission to access this resource.")
+        };
+    });
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwaggerSetup();
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy("PermissionPolicy", policy => policy.RequireAuthenticatedUser());
+
+    builder.Services.AddSwaggerConfiguration();
+
+    var app = builder.Build();
+
+    app.UseContextMigrations();
+
+    app.UseSerilogRequestLogging(options =>
+    {
+        options.GetLevel = (httpContext, _, ex) =>
+            ex is not null || httpContext.Response.StatusCode >= 500
+                ? Serilog.Events.LogEventLevel.Error
+                : httpContext.Request.Path.StartsWithSegments("/health")
+                    ? Serilog.Events.LogEventLevel.Verbose
+                    : Serilog.Events.LogEventLevel.Information;
+    });
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwaggerSetup();
+    }
+    else
+    {
+        app.UseExceptionHandler();
+    }
+
+    app.UseCors("AllowAllOrigins");
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.UseMiddleware<PermissionMiddleware>();
+    app.UseRateLimiter();
+
+    app.MapControllers();
+
+    app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
+    app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
+
+    app.Run();
+
 }
-else
+catch (Exception ex)
 {
-    app.UseExceptionHandler();
+    Log.Fatal(ex, "Application terminated unexpectedly");
 }
-
-app.UseCors("AllowAllOrigins");
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseMiddleware<PermissionMiddleware>();
-app.UseRateLimiter();
-
-app.MapControllers();
-
-app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
-app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
-
-app.Run();
+finally
+{
+    Log.CloseAndFlush();
+}
