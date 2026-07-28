@@ -7,7 +7,7 @@ public class LinkRequestValidator : AbstractValidator<LinkRequest>
 {
     private static readonly HashSet<string> ReservedSlugs =
     [
-        "dashboard", "admin", "links", "metrics", "health"
+        "dashboard", "admin", "links", "metrics", "health", "logs"
     ];
 
     public LinkRequestValidator()
