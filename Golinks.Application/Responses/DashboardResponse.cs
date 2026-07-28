@@ -14,6 +14,8 @@ public class DashboardResponse
     public List<LabelCountResponse> ByOs { get; set; } = [];
     public List<DailyCountResponse> ClicksOverTime { get; set; } = [];
     public List<HeatmapEntryResponse> Heatmap { get; set; } = [];
+    public List<TopLinkResponse> TopLinks { get; set; } = [];
+    public List<LabelCountResponse> ByReferrer { get; set; } = [];
 }
 
 public class LabelCountResponse
@@ -32,5 +34,12 @@ public class HeatmapEntryResponse
 {
     public int DayOfWeek { get; set; }
     public int Hour { get; set; }
+    public int Count { get; set; }
+}
+
+public class TopLinkResponse
+{
+    public required string Slug { get; set; }
+    public required string Url { get; set; }
     public int Count { get; set; }
 }

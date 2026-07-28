@@ -22,6 +22,7 @@ public class GetDashboardHandler(GolinksContext context, IMemoryCache cache, Das
 
         var query = context.Metrics
             .AsNoTracking()
+            .Include(m => m.Link)
             .Where(m => m.CreatedAt >= startDate);
 
         if (request.LinkId.HasValue)
@@ -39,7 +40,11 @@ public class GetDashboardHandler(GolinksContext context, IMemoryCache cache, Das
                 m.Browser,
                 m.Os,
                 m.IsBot,
-                m.IpHash
+                m.IpHash,
+                m.LinkId,
+                m.Referrer,
+                Slug = m.Link != null ? m.Link.Slug : null,
+                Url = m.Link != null ? m.Link.Url : null
             })
             .ToListAsync(cancellationToken);
 
@@ -107,6 +112,27 @@ public class GetDashboardHandler(GolinksContext context, IMemoryCache cache, Das
             })
             .ToList();
 
+        var topLinks = metrics
+            .Where(m => m.Slug != null)
+            .GroupBy(m => m.LinkId)
+            .Select(g => new TopLinkResponse
+            {
+                Slug = g.First().Slug!,
+                Url = g.First().Url!,
+                Count = g.Count()
+            })
+            .OrderByDescending(x => x.Count)
+            .Take(10)
+            .ToList();
+
+        var byReferrer = metrics
+            .Where(m => !string.IsNullOrWhiteSpace(m.Referrer))
+            .GroupBy(m => m.Referrer!)
+            .Select(g => new LabelCountResponse { Label = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(10)
+            .ToList();
+
         var response = new DashboardResponse
         {
             TotalClicks = totalClicks,
@@ -120,7 +146,9 @@ public class GetDashboardHandler(GolinksContext context, IMemoryCache cache, Das
             ByBrowser = byBrowser,
             ByOs = byOs,
             ClicksOverTime = clicksOverTime,
-            Heatmap = heatmap
+            Heatmap = heatmap,
+            TopLinks = topLinks,
+            ByReferrer = byReferrer
         };
 
         cache.Set(cacheKey, response, TimeSpan.FromMinutes(5));
