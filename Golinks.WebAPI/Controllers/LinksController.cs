@@ -31,7 +31,7 @@ public class LinksController(IMediator mediator, IConfiguration configuration) :
     public async Task<IActionResult> Index([FromQuery] LinkParams @params)
     {
         var baseUrl = Url.Action(nameof(Index), "Links", null, Request.Scheme);
-        var result = await mediator.Send(new GetAllLinksQuery(@params.PageNumber, @params.PageSize, baseUrl));
+        var result = await mediator.Send(new GetAllLinksQuery(@params.PageNumber, @params.PageSize, baseUrl, @params.Search));
         return result.ToActionResult(this, Ok);
     }
 

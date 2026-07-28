@@ -19,4 +19,6 @@ public class LinkParams
             _pageSize = value < 1 ? 1 : (value > MaxPageSize) ? MaxPageSize : value;
         }
     }
+
+    public string? Search { get; set; }
 }
