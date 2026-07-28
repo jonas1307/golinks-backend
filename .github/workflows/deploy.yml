@@ -25,6 +25,7 @@ jobs:
           Auth0Audience: ${{ secrets.AUTH0_AUDIENCE }}
           Auth0Authority: ${{ secrets.AUTH0_AUTHORITY }}
           PublicBaseUrl: ${{ secrets.PUBLIC_BASE_URL }}
+          SeqUrl: ${{ secrets.SEQ_URL }}
 
       - name: Deploy to Railway
         run: railway up --service ${{ secrets.RAILWAY_SERVICE_ID }} --ci
