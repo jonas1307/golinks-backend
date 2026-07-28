@@ -40,7 +40,8 @@ Routes follow kebab-case convention.
 | `DELETE` | `/links/{id}` | `golinks:admin` | Delete a link |
 | `GET` | `/links/{id}/qrcode` | Required | Get a PNG QR code for the link's public URL |
 | `GET` | `/metrics` | Public | List links with access metrics |
-| `GET` | `/dashboard` | Required | Get analytics dashboard (clicks, device, browser, OS, heatmap) |
+| `GET` | `/logs` | Required | List access logs with filters (date range, link, bot type) |
+| `GET` | `/dashboard` | Required | Get analytics dashboard (visits, device, browser, OS, traffic pattern) |
 | `POST` | `/dashboard/backfill-ua` | `golinks:admin` | Parse stored User-Agent strings on existing metric records |
 | `GET` | `/health/live` | Public | Liveness probe (process is responding) |
 | `GET` | `/health/ready` | Public | Readiness probe (database is reachable) |
@@ -110,7 +111,11 @@ Features/Links/
   Queries/
     GetAllLinks/
     GetLinkById/
+    GetLinkQrCode/
     GetMetrics/
+Features/Logs/
+  Queries/
+    GetAccessLogs/
 Features/Metrics/
   Commands/
     BackfillUserAgents/
